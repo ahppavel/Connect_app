@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '03_welcome_screen.dart';
+import '03_log_in_screen.dart';
 
 class LanguageScreen extends StatefulWidget {
   const LanguageScreen({super.key});
@@ -251,13 +251,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            WelcomeScreen(
+                        pageBuilder:
+                            (context, animation, secondaryAnimation) =>
+                                LoginScreen(
                           languageName: selected['name']!,
                           languageCode: selected['code']!,
                         ),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
+                        transitionsBuilder: (context, animation,
+                            secondaryAnimation, child) {
                           return FadeTransition(
                             opacity: animation,
                             child: SlideTransition(
@@ -272,7 +273,8 @@ class _LanguageScreenState extends State<LanguageScreen> {
                             ),
                           );
                         },
-                        transitionDuration: const Duration(milliseconds: 400),
+                        transitionDuration:
+                            const Duration(milliseconds: 400),
                       ),
                     );
                   },
