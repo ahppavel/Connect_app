@@ -24,7 +24,6 @@ enum MessageStatus { sending, sent, delivered, seen }
 class ChatPreview {
   final String id;
   final String name;
-  final String? avatarUrl;
   final String lastMessage;
   final String time;
   final int unreadCount;
@@ -40,7 +39,6 @@ class ChatPreview {
   const ChatPreview({
     required this.id,
     required this.name,
-    this.avatarUrl,
     required this.lastMessage,
     required this.time,
     required this.unreadCount,
@@ -61,137 +59,18 @@ class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
 
   static const Color primary = Color(0xFF9d4d36);
-  static const Color bg = Color(0xFF111111);
-  static const Color cardBg = Color(0xFF1A1A1A);
+  static const Color bg = Color(0xFFF7F9FC);
+  static const Color cardBg = Color(0xFFEEEFF4);
   static const Color onlineGreen = Color(0xFF25D366);
   static const Color seenYellow = Color(0xFFFFD700);
 
-  final List<ChatPreview> _dummyChats = [
-    ChatPreview(
-      id: '1',
-      name: 'Sarah Johnson',
-      lastMessage: 'Hey! Are you coming tonight? 🎉',
-      time: '12:18 AM',
-      unreadCount: 3,
-      isOnline: true,
-      isGroup: false,
-      isDeleted: false,
-      isMissedCall: false,
-      isMe: false,
-      status: MessageStatus.seen,
-      avatarLetters: 'SJ',
-      avatarColor: const Color(0xFF6C63FF),
-    ),
-    ChatPreview(
-      id: '2',
-      name: 'Ahmed Ali',
-      lastMessage: '📷 Photo',
-      time: '12:11 AM',
-      unreadCount: 0,
-      isOnline: false,
-      isGroup: false,
-      isDeleted: false,
-      isMissedCall: false,
-      isMe: true,
-      status: MessageStatus.seen,
-      avatarLetters: 'AA',
-      avatarColor: const Color(0xFF25D366),
-    ),
-    ChatPreview(
-      id: '3',
-      name: 'Team Connect 🔥',
-      lastMessage: 'Fahim: Let\'s meet tomorrow morning',
-      time: 'Yesterday',
-      unreadCount: 5,
-      isOnline: false,
-      isGroup: true,
-      isDeleted: false,
-      isMissedCall: false,
-      isMe: false,
-      status: MessageStatus.delivered,
-      avatarLetters: 'TC',
-      avatarColor: primary,
-    ),
-    ChatPreview(
-      id: '4',
-      name: 'Mila Rahman',
-      lastMessage: 'You deleted this message',
-      time: 'Yesterday',
-      unreadCount: 0,
-      isOnline: true,
-      isGroup: false,
-      isDeleted: true,
-      isMissedCall: false,
-      isMe: false,
-      status: MessageStatus.delivered,
-      avatarLetters: 'MR',
-      avatarColor: const Color(0xFF0088CC),
-    ),
-    ChatPreview(
-      id: '5',
-      name: 'University CSE-63',
-      lastMessage: 'Arif: Anyone done the assignment?',
-      time: 'Yesterday',
-      unreadCount: 12,
-      isOnline: false,
-      isGroup: true,
-      isDeleted: false,
-      isMissedCall: false,
-      isMe: false,
-      status: MessageStatus.sent,
-      avatarLetters: 'UC',
-      avatarColor: const Color(0xFFFF6B6B),
-    ),
-    ChatPreview(
-      id: '6',
-      name: 'Balbu',
-      lastMessage: '🎤 Voice message',
-      time: 'Yesterday',
-      unreadCount: 0,
-      isOnline: false,
-      isGroup: false,
-      isDeleted: false,
-      isMissedCall: false,
-      isMe: true,
-      status: MessageStatus.delivered,
-      avatarLetters: 'BA',
-      avatarColor: const Color(0xFF4ECDC4),
-    ),
-    ChatPreview(
-      id: '7',
-      name: 'Arif Hossain',
-      lastMessage: '📞 Missed voice call',
-      time: '4/10/26',
-      unreadCount: 1,
-      isOnline: false,
-      isGroup: false,
-      isDeleted: false,
-      isMissedCall: true,
-      isMe: false,
-      status: MessageStatus.sent,
-      avatarLetters: 'AH',
-      avatarColor: const Color(0xFFFFBE0B),
-    ),
-    ChatPreview(
-      id: '8',
-      name: 'Anurbo Emon',
-      lastMessage: 'Send me the file bro',
-      time: '4/3/26',
-      unreadCount: 0,
-      isOnline: true,
-      isGroup: false,
-      isDeleted: false,
-      isMissedCall: false,
-      isMe: false,
-      status: MessageStatus.seen,
-      avatarLetters: 'AE',
-      avatarColor: const Color(0xFFFF006E),
-    ),
-  ];
+  // TODO: Replace with real Firebase data later
+  // Empty list — chats will appear when users actually message each other
+  final List<ChatPreview> _chats = [];
 
   List<ChatPreview> get _filteredChats {
-    if (_searchQuery.isEmpty) return _dummyChats;
-    return _dummyChats
+    if (_searchQuery.isEmpty) return _chats;
+    return _chats
         .where((c) =>
             c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             c.lastMessage.toLowerCase().contains(_searchQuery.toLowerCase()))
@@ -205,24 +84,101 @@ class _HomeScreenState extends State<HomeScreen> {
         'stories': 'Stories',
         'calls': 'Calls',
         'settings': 'Settings',
-        'search': 'Search',
+        'search': 'Search or start new chat',
         'no_chats': 'No chats yet',
-        'no_chats_sub': 'Start a conversation!',
+        'no_chats_sub': 'Tap the pencil button to start a conversation!',
         'no_results': 'No results found',
-        'online': 'Online',
       },
       'BN': {
         'chats': 'চ্যাট',
         'stories': 'স্টোরি',
         'calls': 'কল',
         'settings': 'সেটিংস',
-        'search': 'খুঁজুন',
+        'search': 'খুঁজুন বা নতুন চ্যাট শুরু করুন',
         'no_chats': 'এখনো কোনো চ্যাট নেই',
-        'no_chats_sub': 'কথা শুরু করুন!',
+        'no_chats_sub': 'নতুন কথোপকথন শুরু করতে পেন্সিল বাটন চাপুন!',
         'no_results': 'কোনো ফলাফল পাওয়া যায়নি',
-        'online': 'অনলাইন',
       },
-      // ... other languages (keep as in your original)
+      'RU': {
+        'chats': 'Чаты',
+        'stories': 'Истории',
+        'calls': 'Звонки',
+        'settings': 'Настройки',
+        'search': 'Поиск или новый чат',
+        'no_chats': 'Нет чатов',
+        'no_chats_sub': 'Нажмите кнопку карандаша, чтобы начать!',
+        'no_results': 'Ничего не найдено',
+      },
+      'AR': {
+        'chats': 'المحادثات',
+        'stories': 'القصص',
+        'calls': 'المكالمات',
+        'settings': 'الإعدادات',
+        'search': 'بحث أو بدء محادثة',
+        'no_chats': 'لا توجد محادثات',
+        'no_chats_sub': 'اضغط على زر القلم لبدء محادثة!',
+        'no_results': 'لا توجد نتائج',
+      },
+      'ES': {
+        'chats': 'Chats',
+        'stories': 'Historias',
+        'calls': 'Llamadas',
+        'settings': 'Ajustes',
+        'search': 'Buscar o iniciar chat',
+        'no_chats': 'Sin chats aún',
+        'no_chats_sub': '¡Toca el botón de lápiz para comenzar!',
+        'no_results': 'Sin resultados',
+      },
+      'FR': {
+        'chats': 'Discussions',
+        'stories': 'Statuts',
+        'calls': 'Appels',
+        'settings': 'Paramètres',
+        'search': 'Rechercher ou nouveau chat',
+        'no_chats': 'Pas encore de discussions',
+        'no_chats_sub': 'Appuyez sur le crayon pour commencer!',
+        'no_results': 'Aucun résultat',
+      },
+      'HI': {
+        'chats': 'चैट',
+        'stories': 'स्टोरी',
+        'calls': 'कॉल',
+        'settings': 'सेटिंग',
+        'search': 'खोजें या नई चैट शुरू करें',
+        'no_chats': 'अभी कोई चैट नहीं',
+        'no_chats_sub': 'बातचीत शुरू करने के लिए पेंसिल बटन दबाएं!',
+        'no_results': 'कोई परिणाम नहीं',
+      },
+      'PT': {
+        'chats': 'Conversas',
+        'stories': 'Status',
+        'calls': 'Chamadas',
+        'settings': 'Config.',
+        'search': 'Pesquisar ou nova conversa',
+        'no_chats': 'Sem conversas ainda',
+        'no_chats_sub': 'Toque no lápis para começar!',
+        'no_results': 'Sem resultados',
+      },
+      'ZH': {
+        'chats': '聊天',
+        'stories': '动态',
+        'calls': '通话',
+        'settings': '设置',
+        'search': '搜索或开始新聊天',
+        'no_chats': '暂无聊天',
+        'no_chats_sub': '点击铅笔按钮开始对话！',
+        'no_results': '未找到结果',
+      },
+      'JA': {
+        'chats': 'チャット',
+        'stories': 'ストーリー',
+        'calls': '通話',
+        'settings': '設定',
+        'search': '検索または新しいチャット',
+        'no_chats': 'チャットはまだありません',
+        'no_chats_sub': '鉛筆ボタンをタップして会話を始めましょう！',
+        'no_results': '結果が見つかりません',
+      },
     };
     final code = widget.languageCode.toUpperCase();
     return tr[code]?[key] ?? tr['EN']![key]!;
@@ -241,56 +197,79 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
+        automaticallyImplyLeading: false,
         title: Text(
           'Connect',
           style: GoogleFonts.dancingScript(
-            fontSize: 30,
+            fontSize: 32,
             fontWeight: FontWeight.w700,
             color: primary,
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.camera_alt_outlined, color: Colors.white70),
-            onPressed: () {},
-          ),
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: primary,
-            child: Text(
-              widget.fullName.isNotEmpty ? widget.fullName[0].toUpperCase() : '?',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+          // Profile avatar
+          GestureDetector(
+            onTap: () {},
+            child: Container(
+              margin: const EdgeInsets.only(right: 4),
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: primary,
+                border: Border.all(
+                    color: primary.withOpacity(0.3), width: 2),
+              ),
+              child: Center(
+                child: Text(
+                  widget.fullName.isNotEmpty
+                      ? widget.fullName[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.white70),
+            icon: Icon(Icons.more_vert,
+                color: Colors.grey[600], size: 24),
             onPressed: () {},
           ),
         ],
       ),
+
       body: Column(
         children: [
           // Search bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Container(
-              height: 44,
+              height: 46,
               decoration: BoxDecoration(
                 color: cardBg,
                 borderRadius: BorderRadius.circular(999),
               ),
               child: TextField(
                 controller: _searchController,
-                style: const TextStyle(color: Colors.white70),
-                onChanged: (val) => setState(() => _searchQuery = val),
+                style: const TextStyle(
+                    color: Color(0xFF191c1e), fontSize: 15),
+                onChanged: (val) =>
+                    setState(() => _searchQuery = val),
                 decoration: InputDecoration(
                   hintText: _t('search'),
-                  hintStyle: const TextStyle(color: Colors.white38),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white38),
+                  hintStyle: TextStyle(
+                      color: Colors.grey[400], fontSize: 14),
+                  prefixIcon: Icon(Icons.search,
+                      color: Colors.grey[400], size: 20),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white38),
+                          icon: Icon(Icons.close,
+                              color: Colors.grey[400], size: 18),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
@@ -298,144 +277,327 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       : null,
                   border: InputBorder.none,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 13),
                 ),
               ),
             ),
           ),
+
+          const SizedBox(height: 4),
+
           // Chat list
           Expanded(
             child: _filteredChats.isEmpty
                 ? _buildEmptyState()
-                : ListView.builder(
+                : ListView.separated(
+                    padding: const EdgeInsets.only(top: 4),
                     itemCount: _filteredChats.length,
-                    itemBuilder: (context, index) => _chatTile(_filteredChats[index]),
+                    separatorBuilder: (_, __) => Divider(
+                      height: 0.5,
+                      color: Colors.grey[200],
+                      indent: 84,
+                    ),
+                    itemBuilder: (context, index) =>
+                        _chatTile(_filteredChats[index]),
                   ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: cardBg,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: primary,
-        unselectedItemColor: Colors.white38,
-        currentIndex: _currentTab,
-        onTap: (index) => setState(() => _currentTab = index),
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: _t('chats')),
-          BottomNavigationBarItem(icon: Icon(Icons.auto_stories_outlined), label: _t('stories')),
-          BottomNavigationBarItem(icon: Icon(Icons.call_outlined), label: _t('calls')),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: _t('settings')),
-        ],
+
+      // Bottom navigation
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _navItem(0, Icons.chat_bubble_rounded,
+                    Icons.chat_bubble_outline_rounded, _t('chats')),
+                _navItem(1, Icons.auto_stories,
+                    Icons.auto_stories_outlined, _t('stories')),
+                _navItem(2, Icons.call_rounded,
+                    Icons.call_outlined, _t('calls')),
+                _navItem(3, Icons.settings_rounded,
+                    Icons.settings_outlined, _t('settings')),
+              ],
+            ),
+          ),
+        ),
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: primary,
-        child: const Icon(Icons.edit_outlined),
+        elevation: 4,
+        child: const Icon(Icons.edit_outlined,
+            color: Colors.white, size: 24),
       ),
     );
   }
 
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.chat_bubble_outline, size: 80, color: Colors.white12),
-          const SizedBox(height: 16),
-          Text(
-            _searchQuery.isNotEmpty ? _t('no_results') : _t('no_chats'),
-            style: const TextStyle(color: Colors.white38, fontSize: 18),
-          ),
-          if (_searchQuery.isEmpty)
-            Text(_t('no_chats_sub'), style: const TextStyle(color: Colors.white24)),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: primary.withOpacity(0.08),
+              ),
+              child: Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 50,
+                color: primary.withOpacity(0.4),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _searchQuery.isNotEmpty
+                  ? _t('no_results')
+                  : _t('no_chats'),
+              style: const TextStyle(
+                color: Color(0xFF191c1e),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            if (_searchQuery.isEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                _t('no_chats_sub'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem(int index, IconData activeIcon,
+      IconData inactiveIcon, String label) {
+    final isActive = _currentTab == index;
+    return GestureDetector(
+      onTap: () => setState(() => _currentTab = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 20, vertical: 6),
+        decoration: BoxDecoration(
+          color: isActive
+              ? primary.withOpacity(0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isActive ? activeIcon : inactiveIcon,
+              color: isActive ? primary : Colors.grey[400],
+              size: 24,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: isActive ? primary : Colors.grey[400],
+                fontWeight: isActive
+                    ? FontWeight.w600
+                    : FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _chatTile(ChatPreview chat) {
-    return ListTile(
+    return InkWell(
       onTap: () {},
-      leading: Stack(
-        children: [
-          CircleAvatar(
-            radius: 26,
-            backgroundColor: chat.avatarColor,
-            child: Text(chat.avatarLetters, style: const TextStyle(color: Colors.white)),
-          ),
-          if (chat.isOnline)
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: onlineGreen,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: bg, width: 2),
+      splashColor: primary.withOpacity(0.05),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            // Avatar
+            Stack(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: chat.avatarColor,
+                  ),
+                  child: Center(
+                    child: Text(
+                      chat.avatarLetters,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
+                if (chat.isOnline)
+                  Positioned(
+                    bottom: 1,
+                    right: 1,
+                    child: Container(
+                      width: 13,
+                      height: 13,
+                      decoration: BoxDecoration(
+                        color: onlineGreen,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: bg, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            if (chat.isGroup)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 4),
+                                child: Icon(Icons.group,
+                                    size: 14,
+                                    color: Colors.grey[400]),
+                              ),
+                            Flexible(
+                              child: Text(
+                                chat.name,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: const Color(0xFF191c1e),
+                                  fontWeight: chat.unreadCount > 0
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        chat.time,
+                        style: TextStyle(
+                          color: chat.unreadCount > 0
+                              ? primary
+                              : Colors.grey[400],
+                          fontSize: 12,
+                          fontWeight: chat.unreadCount > 0
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 3),
+
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            if (chat.isMe && !chat.isDeleted)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 4),
+                                child: _buildTick(chat.status),
+                              ),
+                            Expanded(
+                              child: Text(
+                                chat.lastMessage,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: chat.isDeleted
+                                      ? Colors.grey[400]
+                                      : chat.isMissedCall
+                                          ? Colors.redAccent
+                                          : Colors.grey[500],
+                                  fontSize: 13,
+                                  fontStyle: chat.isDeleted
+                                      ? FontStyle.italic
+                                      : FontStyle.normal,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (chat.unreadCount > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: primary,
+                            borderRadius:
+                                BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            chat.unreadCount > 99
+                                ? '99+'
+                                : chat.unreadCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ),
             ),
-        ],
-      ),
-      title: Row(
-        children: [
-          if (chat.isGroup) const Icon(Icons.group, size: 14, color: Colors.white38),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              chat.name,
-              style: TextStyle(
-                color: chat.unreadCount > 0 ? Colors.white : Colors.white70,
-                fontWeight: chat.unreadCount > 0 ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ),
-          Text(
-            chat.time,
-            style: TextStyle(
-              color: chat.unreadCount > 0 ? primary : Colors.white38,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          if (chat.isMe && !chat.isDeleted)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: _buildTick(chat.status),
-            ),
-          Expanded(
-            child: Text(
-              chat.lastMessage,
-              style: TextStyle(
-                color: chat.isDeleted
-                    ? Colors.white24
-                    : chat.isMissedCall
-                        ? Colors.redAccent
-                        : Colors.white38,
-                fontSize: 13,
-                fontStyle: chat.isDeleted ? FontStyle.italic : FontStyle.normal,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          if (chat.unreadCount > 0)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                chat.unreadCount > 99 ? '99+' : chat.unreadCount.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 11),
-              ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -443,25 +605,30 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTick(MessageStatus status) {
     switch (status) {
       case MessageStatus.sending:
-        return const Icon(Icons.access_time, size: 14, color: Colors.white38);
+        return Icon(Icons.access_time,
+            size: 14, color: Colors.grey[400]);
       case MessageStatus.sent:
-        return const Icon(Icons.check, size: 14, color: Colors.white38);
+        return Icon(Icons.check, size: 14, color: Colors.grey[400]);
       case MessageStatus.delivered:
-        return const Row(
-          mainAxisSize: MainAxisSize.min,
+        return Stack(
           children: [
-            Icon(Icons.check, size: 14, color: Colors.white38),
-            SizedBox(width: -6),
-            Icon(Icons.check, size: 14, color: Colors.white38),
+            Icon(Icons.check, size: 14, color: Colors.grey[400]),
+            Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: Icon(Icons.check,
+                  size: 14, color: Colors.grey[400]),
+            ),
           ],
         );
       case MessageStatus.seen:
-        return const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        return Stack(
+          children: const [
             Icon(Icons.check, size: 14, color: seenYellow),
-            SizedBox(width: -6),
-            Icon(Icons.check, size: 14, color: seenYellow),
+            Padding(
+              padding: EdgeInsets.only(left: 6),
+              child: Icon(Icons.check,
+                  size: 14, color: seenYellow),
+            ),
           ],
         );
     }
