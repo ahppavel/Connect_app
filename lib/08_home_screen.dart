@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '09_profile_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final String languageCode;
@@ -209,7 +211,19 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           // Profile avatar
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProfileScreen(
+                    languageCode: widget.languageCode,
+                    initialName: widget.fullName,
+                    initialUsername: widget.username,
+                    initialEmail: '', // TODO: Add email when available
+                  ),
+                ),
+              );
+            },
             child: Container(
               margin: const EdgeInsets.only(right: 4),
               width: 38,
@@ -237,7 +251,19 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.more_vert,
                 color: Colors.grey[600], size: 24),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProfileScreen(
+                    languageCode: widget.languageCode,
+                    initialName: widget.fullName,
+                    initialUsername: widget.username,
+                    initialEmail: '', // TODO: Add email when available
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
