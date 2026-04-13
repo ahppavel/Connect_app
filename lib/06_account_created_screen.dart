@@ -25,15 +25,13 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
     with TickerProviderStateMixin {
   late AnimationController _checkController;
   late AnimationController _fadeController;
-  late Animation<double> _checkAnimation;
-  late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
 
   static const Color primary = Color(0xFF9d4d36);
   static const Color green = Color(0xFF25d366);
   static const Color bg = Color(0xFFF7F9FC);
 
-  // Permission states
   Map<Permission, bool> _permissionGranted = {};
 
   String t(String key) {
@@ -55,11 +53,6 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
       vsync: this,
     );
 
-    _checkAnimation = CurvedAnimation(
-      parent: _checkController,
-      curve: Curves.elasticOut,
-    );
-
     _scaleAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _checkController, curve: Curves.elasticOut),
     );
@@ -68,7 +61,6 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
       CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
     );
 
-    // Initialize permission states (check current status)
     _initPermissionStates();
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -85,8 +77,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
     final microphoneStatus = await Permission.microphone.status;
 
     setState(() {
-      _permissionGranted[Permission.notification] =
-          notificationStatus.isGranted;
+      _permissionGranted[Permission.notification] = notificationStatus.isGranted;
       _permissionGranted[Permission.camera] = cameraStatus.isGranted;
       _permissionGranted[Permission.microphone] = microphoneStatus.isGranted;
     });
@@ -129,8 +120,6 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-
-              // Animated check circle
               ScaleTransition(
                 scale: _scaleAnimation,
                 child: Container(
@@ -141,17 +130,10 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                     color: green.withOpacity(0.1),
                     border: Border.all(color: green.withOpacity(0.3), width: 2),
                   ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    size: 80,
-                    color: green,
-                  ),
+                  child: const Icon(Icons.check_circle_rounded, size: 80, color: green),
                 ),
               ),
-
               const SizedBox(height: 32),
-
-              // All set title
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
@@ -163,10 +145,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Welcome message with name
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
@@ -179,15 +158,11 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                   ),
                 ),
               ),
-
               const SizedBox(height: 8),
-
-              // Username chip
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: primary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(999),
@@ -203,25 +178,16 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
                   t('account_ready'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey[600],
-                    height: 1.6,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.grey[600], height: 1.6),
                 ),
               ),
-
               const SizedBox(height: 32),
-
-              // Permissions Section
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Container(
@@ -270,51 +236,61 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                   ),
                 ),
               ),
-
               const Spacer(),
-
-              // Go to login button - UPDATED to pass fullName & username
+              // No-splash button: GestureDetector + Container
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: SizedBox(
                   width: double.infinity,
                   height: 54,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (_, __, ___) => TransitionScreen(
-                            languageCode: widget.languageCode,
-                            languageName: widget.languageName,
-                            fullName: widget.fullName,   // <-- added
-                            username: widget.username,   // <-- added
+                  child: GestureDetector(
+                    onTap: () {
+                      // Dismiss keyboard to avoid any visual glitch
+                      FocusScope.of(context).unfocus();
+                      // Slight delay to let keyboard close
+                      Future.delayed(const Duration(milliseconds: 50), () {
+                        if (!mounted) return;
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => TransitionScreen(
+                              languageCode: widget.languageCode,
+                              languageName: widget.languageName,
+                              fullName: widget.fullName,
+                              username: widget.username,
+                            ),
+                            transitionsBuilder: (_, anim, __, child) =>
+                                FadeTransition(opacity: anim, child: child),
+                            transitionDuration: const Duration(milliseconds: 600),
                           ),
-                          transitionsBuilder: (_, anim, __, child) =>
-                              FadeTransition(opacity: anim, child: child),
-                          transitionDuration: const Duration(milliseconds: 600),
-                        ),
-                      );
+                        );
+                      });
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999)),
-                      elevation: 4,
-                      shadowColor: primary.withOpacity(0.3),
-                    ),
-                    child: Text(
-                      t('go_to_login'),
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: primary,
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        t('go_to_login'),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
             ],
           ),
@@ -359,10 +335,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
               children: [
                 Icon(Icons.check, size: 14, color: green),
                 const SizedBox(width: 4),
-                Text(
-                  t('allowed'),
-                  style: TextStyle(fontSize: 12, color: green),
-                ),
+                Text(t('allowed'), style: const TextStyle(fontSize: 12, color: green)),
               ],
             ),
           )
@@ -371,8 +344,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
             children: [
               _permButton(t('allow'), () => _requestPermission(permission)),
               const SizedBox(width: 8),
-              _permButton(t('dont_allow'), () => _denyPermission(permission),
-                  isAllow: false),
+              _permButton(t('dont_allow'), () => _denyPermission(permission), isAllow: false),
             ],
           ),
       ],
@@ -387,10 +359,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
         decoration: BoxDecoration(
           color: isAllow ? primary : Colors.grey[200],
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isAllow ? primary : Colors.grey[400]!,
-            width: 1,
-          ),
+          border: Border.all(color: isAllow ? primary : Colors.grey[400]!, width: 1),
         ),
         child: Text(
           text,
@@ -405,13 +374,12 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
   }
 }
 
-// Translations (unchanged)
+// Complete translations for all 10 languages
 const Map<String, Map<String, String>> _tr = {
   'EN': {
     'all_set': "You're all set!",
     'welcome': 'Welcome',
-    'account_ready':
-        'Your account has been created successfully.\nYou can now log in and start connecting.',
+    'account_ready': 'Your account has been created successfully.\nYou can now log in and start connecting.',
     'enable_permissions': 'Enable permissions for better experience',
     'notifications': 'Notifications',
     'camera': 'Camera',
@@ -425,8 +393,7 @@ const Map<String, Map<String, String>> _tr = {
   'BN': {
     'all_set': 'সব প্রস্তুত!',
     'welcome': 'স্বাগতম',
-    'account_ready':
-        'আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।\nএখন লগ ইন করে সংযোগ শুরু করুন।',
+    'account_ready': 'আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।\nএখন লগ ইন করে সংযোগ শুরু করুন।',
     'enable_permissions': 'ভালো অভিজ্ঞতার জন্য অনুমতি দিন',
     'notifications': 'বিজ্ঞপ্তি',
     'camera': 'ক্যামেরা',
@@ -440,8 +407,7 @@ const Map<String, Map<String, String>> _tr = {
   'RU': {
     'all_set': 'Всё готово!',
     'welcome': 'Добро пожаловать',
-    'account_ready':
-        'Ваш аккаунт успешно создан.\nТеперь войдите и начните общение.',
+    'account_ready': 'Ваш аккаунт успешно создан.\nТеперь войдите и начните общение.',
     'enable_permissions': 'Разрешите доступ для лучшего опыта',
     'notifications': 'Уведомления',
     'camera': 'Камера',
@@ -469,8 +435,7 @@ const Map<String, Map<String, String>> _tr = {
   'ES': {
     'all_set': '¡Todo listo!',
     'welcome': 'Bienvenido',
-    'account_ready':
-        'Tu cuenta ha sido creada exitosamente.\nAhora puedes iniciar sesión.',
+    'account_ready': 'Tu cuenta ha sido creada exitosamente.\nAhora puedes iniciar sesión.',
     'enable_permissions': 'Habilita permisos para una mejor experiencia',
     'notifications': 'Notificaciones',
     'camera': 'Cámara',
@@ -484,8 +449,7 @@ const Map<String, Map<String, String>> _tr = {
   'FR': {
     'all_set': 'Tout est prêt !',
     'welcome': 'Bienvenue',
-    'account_ready':
-        'Votre compte a été créé avec succès.\nVous pouvez maintenant vous connecter.',
+    'account_ready': 'Votre compte a été créé avec succès.\nVous pouvez maintenant vous connecter.',
     'enable_permissions': 'Activez les autorisations pour une meilleure expérience',
     'notifications': 'Notifications',
     'camera': 'Caméra',
@@ -499,8 +463,7 @@ const Map<String, Map<String, String>> _tr = {
   'HI': {
     'all_set': 'सब तैयार है!',
     'welcome': 'स्वागत है',
-    'account_ready':
-        'आपका खाता सफलतापूर्वक बनाया गया है।\nअब लॉग इन करें।',
+    'account_ready': 'आपका खाता सफलतापूर्वक बनाया गया है।\nअब लॉग इन करें।',
     'enable_permissions': 'बेहतर अनुभव के लिए अनुमतियाँ सक्षम करें',
     'notifications': 'सूचनाएं',
     'camera': 'कैमरा',
@@ -514,8 +477,7 @@ const Map<String, Map<String, String>> _tr = {
   'PT': {
     'all_set': 'Tudo pronto!',
     'welcome': 'Bem-vindo',
-    'account_ready':
-        'Sua conta foi criada com sucesso.\nAgora você pode fazer login.',
+    'account_ready': 'Sua conta foi criada com sucesso.\nAgora você pode fazer login.',
     'enable_permissions': 'Ative as permissões para uma melhor experiência',
     'notifications': 'Notificações',
     'camera': 'Câmera',
@@ -543,8 +505,7 @@ const Map<String, Map<String, String>> _tr = {
   'JA': {
     'all_set': '準備完了！',
     'welcome': 'ようこそ',
-    'account_ready':
-        'アカウントが正常に作成されました。\nログインして接続を開始できます。',
+    'account_ready': 'アカウントが正常に作成されました。\nログインして接続を開始できます。',
     'enable_permissions': 'より良い体験のために権限を有効にする',
     'notifications': '通知',
     'camera': 'カメラ',

@@ -23,7 +23,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _fullNameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final List<TextEditingController> _otpControllers =
@@ -38,10 +37,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool _emailVerified = false;
   bool _usernameAvailable = false;
   bool _isCheckingUsername = false;
-  File? _profileImage; // <-- stores the selected image
+  File? _profileImage;
   String _selectedGender = '';
   DateTime? _birthDate;
   String _errorMessage = '';
+
+  // Country code and phone number
+  String _selectedCountryCode = '+1';
+  String _selectedCountryName = 'United States';
+  final TextEditingController _phoneNumberController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
 
@@ -49,6 +53,158 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   static const Color bg = Color(0xFFF7F9FC);
   static const Color inputBg = Color(0xFFEEEFF4);
   static const Color green = Color(0xFF25d366);
+
+  // Comprehensive list of countries (code, name, flag emoji) - expanded
+  final List<Map<String, String>> _allCountries = [
+    {'code': '+1', 'name': 'United States', 'flag': '🇺🇸'},
+    {'code': '+1', 'name': 'Canada', 'flag': '🇨🇦'},
+    {'code': '+44', 'name': 'United Kingdom', 'flag': '🇬🇧'},
+    {'code': '+91', 'name': 'India', 'flag': '🇮🇳'},
+    {'code': '+61', 'name': 'Australia', 'flag': '🇦🇺'},
+    {'code': '+49', 'name': 'Germany', 'flag': '🇩🇪'},
+    {'code': '+33', 'name': 'France', 'flag': '🇫🇷'},
+    {'code': '+81', 'name': 'Japan', 'flag': '🇯🇵'},
+    {'code': '+86', 'name': 'China', 'flag': '🇨🇳'},
+    {'code': '+7', 'name': 'Russia', 'flag': '🇷🇺'},
+    {'code': '+55', 'name': 'Brazil', 'flag': '🇧🇷'},
+    {'code': '+39', 'name': 'Italy', 'flag': '🇮🇹'},
+    {'code': '+34', 'name': 'Spain', 'flag': '🇪🇸'},
+    {'code': '+52', 'name': 'Mexico', 'flag': '🇲🇽'},
+    {'code': '+82', 'name': 'South Korea', 'flag': '🇰🇷'},
+    {'code': '+971', 'name': 'United Arab Emirates', 'flag': '🇦🇪'},
+    {'code': '+966', 'name': 'Saudi Arabia', 'flag': '🇸🇦'},
+    {'code': '+20', 'name': 'Egypt', 'flag': '🇪🇬'},
+    {'code': '+27', 'name': 'South Africa', 'flag': '🇿🇦'},
+    {'code': '+90', 'name': 'Turkey', 'flag': '🇹🇷'},
+    {'code': '+62', 'name': 'Indonesia', 'flag': '🇮🇩'},
+    {'code': '+63', 'name': 'Philippines', 'flag': '🇵🇭'},
+    {'code': '+66', 'name': 'Thailand', 'flag': '🇹🇭'},
+    {'code': '+60', 'name': 'Malaysia', 'flag': '🇲🇾'},
+    {'code': '+84', 'name': 'Vietnam', 'flag': '🇻🇳'},
+    {'code': '+65', 'name': 'Singapore', 'flag': '🇸🇬'},
+    {'code': '+64', 'name': 'New Zealand', 'flag': '🇳🇿'},
+    {'code': '+47', 'name': 'Norway', 'flag': '🇳🇴'},
+    {'code': '+46', 'name': 'Sweden', 'flag': '🇸🇪'},
+    {'code': '+45', 'name': 'Denmark', 'flag': '🇩🇰'},
+    {'code': '+358', 'name': 'Finland', 'flag': '🇫🇮'},
+    {'code': '+31', 'name': 'Netherlands', 'flag': '🇳🇱'},
+    {'code': '+32', 'name': 'Belgium', 'flag': '🇧🇪'},
+    {'code': '+41', 'name': 'Switzerland', 'flag': '🇨🇭'},
+    {'code': '+43', 'name': 'Austria', 'flag': '🇦🇹'},
+    {'code': '+48', 'name': 'Poland', 'flag': '🇵🇱'},
+    {'code': '+420', 'name': 'Czech Republic', 'flag': '🇨🇿'},
+    {'code': '+36', 'name': 'Hungary', 'flag': '🇭🇺'},
+    {'code': '+40', 'name': 'Romania', 'flag': '🇷🇴'},
+    {'code': '+380', 'name': 'Ukraine', 'flag': '🇺🇦'},
+    {'code': '+30', 'name': 'Greece', 'flag': '🇬🇷'},
+    {'code': '+351', 'name': 'Portugal', 'flag': '🇵🇹'},
+    {'code': '+353', 'name': 'Ireland', 'flag': '🇮🇪'},
+    {'code': '+354', 'name': 'Iceland', 'flag': '🇮🇸'},
+    {'code': '+972', 'name': 'Israel', 'flag': '🇮🇱'},
+    {'code': '+98', 'name': 'Iran', 'flag': '🇮🇷'},
+    {'code': '+92', 'name': 'Pakistan', 'flag': '🇵🇰'},
+    {'code': '+94', 'name': 'Sri Lanka', 'flag': '🇱🇰'},
+    {'code': '+880', 'name': 'Bangladesh', 'flag': '🇧🇩'},
+    {'code': '+977', 'name': 'Nepal', 'flag': '🇳🇵'},
+    {'code': '+856', 'name': 'Laos', 'flag': '🇱🇦'},
+    {'code': '+855', 'name': 'Cambodia', 'flag': '🇰🇭'},
+    {'code': '+95', 'name': 'Myanmar', 'flag': '🇲🇲'},
+    {'code': '+998', 'name': 'Uzbekistan', 'flag': '🇺🇿'},
+    {'code': '+992', 'name': 'Tajikistan', 'flag': '🇹🇯'},
+    {'code': '+993', 'name': 'Turkmenistan', 'flag': '🇹🇲'},
+    {'code': '+996', 'name': 'Kyrgyzstan', 'flag': '🇰🇬'},
+    {'code': '+374', 'name': 'Armenia', 'flag': '🇦🇲'},
+    {'code': '+994', 'name': 'Azerbaijan', 'flag': '🇦🇿'},
+    {'code': '+995', 'name': 'Georgia', 'flag': '🇬🇪'},
+    {'code': '+373', 'name': 'Moldova', 'flag': '🇲🇩'},
+    {'code': '+371', 'name': 'Latvia', 'flag': '🇱🇻'},
+    {'code': '+370', 'name': 'Lithuania', 'flag': '🇱🇹'},
+    {'code': '+372', 'name': 'Estonia', 'flag': '🇪🇪'},
+    {'code': '+7', 'name': 'Kazakhstan', 'flag': '🇰🇿'},
+    {'code': '+961', 'name': 'Lebanon', 'flag': '🇱🇧'},
+    {'code': '+963', 'name': 'Syria', 'flag': '🇸🇾'},
+    {'code': '+964', 'name': 'Iraq', 'flag': '🇮🇶'},
+    {'code': '+965', 'name': 'Kuwait', 'flag': '🇰🇼'},
+    {'code': '+968', 'name': 'Oman', 'flag': '🇴🇲'},
+    {'code': '+974', 'name': 'Qatar', 'flag': '🇶🇦'},
+    {'code': '+973', 'name': 'Bahrain', 'flag': '🇧🇭'},
+    {'code': '+218', 'name': 'Libya', 'flag': '🇱🇾'},
+    {'code': '+216', 'name': 'Tunisia', 'flag': '🇹🇳'},
+    {'code': '+213', 'name': 'Algeria', 'flag': '🇩🇿'},
+    {'code': '+212', 'name': 'Morocco', 'flag': '🇲🇦'},
+    {'code': '+222', 'name': 'Mauritania', 'flag': '🇲🇷'},
+    {'code': '+223', 'name': 'Mali', 'flag': '🇲🇱'},
+    {'code': '+226', 'name': 'Burkina Faso', 'flag': '🇧🇫'},
+    {'code': '+227', 'name': 'Niger', 'flag': '🇳🇪'},
+    {'code': '+229', 'name': 'Benin', 'flag': '🇧🇯'},
+    {'code': '+228', 'name': 'Togo', 'flag': '🇹🇬'},
+    {'code': '+233', 'name': 'Ghana', 'flag': '🇬🇭'},
+    {'code': '+225', 'name': 'Ivory Coast', 'flag': '🇨🇮'},
+    {'code': '+224', 'name': 'Guinea', 'flag': '🇬🇳'},
+    {'code': '+231', 'name': 'Liberia', 'flag': '🇱🇷'},
+    {'code': '+232', 'name': 'Sierra Leone', 'flag': '🇸🇱'},
+    {'code': '+245', 'name': 'Guinea-Bissau', 'flag': '🇬🇼'},
+    {'code': '+220', 'name': 'Gambia', 'flag': '🇬🇲'},
+    {'code': '+221', 'name': 'Senegal', 'flag': '🇸🇳'},
+    {'code': '+234', 'name': 'Nigeria', 'flag': '🇳🇬'},
+    {'code': '+237', 'name': 'Cameroon', 'flag': '🇨🇲'},
+    {'code': '+235', 'name': 'Chad', 'flag': '🇹🇩'},
+    {'code': '+236', 'name': 'Central African Republic', 'flag': '🇨🇫'},
+    {'code': '+242', 'name': 'Congo', 'flag': '🇨🇬'},
+    {'code': '+243', 'name': 'DR Congo', 'flag': '🇨🇩'},
+    {'code': '+254', 'name': 'Kenya', 'flag': '🇰🇪'},
+    {'code': '+255', 'name': 'Tanzania', 'flag': '🇹🇿'},
+    {'code': '+256', 'name': 'Uganda', 'flag': '🇺🇬'},
+    {'code': '+250', 'name': 'Rwanda', 'flag': '🇷🇼'},
+    {'code': '+257', 'name': 'Burundi', 'flag': '🇧🇮'},
+    {'code': '+258', 'name': 'Mozambique', 'flag': '🇲🇿'},
+    {'code': '+260', 'name': 'Zambia', 'flag': '🇿🇲'},
+    {'code': '+263', 'name': 'Zimbabwe', 'flag': '🇿🇼'},
+    {'code': '+265', 'name': 'Malawi', 'flag': '🇲🇼'},
+    {'code': '+266', 'name': 'Lesotho', 'flag': '🇱🇸'},
+    {'code': '+267', 'name': 'Botswana', 'flag': '🇧🇼'},
+    {'code': '+268', 'name': 'Eswatini', 'flag': '🇸🇿'},
+    {'code': '+264', 'name': 'Namibia', 'flag': '🇳🇦'},
+    {'code': '+211', 'name': 'South Sudan', 'flag': '🇸🇸'},
+    {'code': '+249', 'name': 'Sudan', 'flag': '🇸🇩'},
+    {'code': '+251', 'name': 'Ethiopia', 'flag': '🇪🇹'},
+    {'code': '+252', 'name': 'Somalia', 'flag': '🇸🇴'},
+    {'code': '+253', 'name': 'Djibouti', 'flag': '🇩🇯'},
+    {'code': '+291', 'name': 'Eritrea', 'flag': '🇪🇷'},
+    {'code': '+230', 'name': 'Mauritius', 'flag': '🇲🇺'},
+    {'code': '+248', 'name': 'Seychelles', 'flag': '🇸🇨'},
+    {'code': '+269', 'name': 'Comoros', 'flag': '🇰🇲'},
+    {'code': '+262', 'name': 'Réunion', 'flag': '🇷🇪'},
+    {'code': '+509', 'name': 'Haiti', 'flag': '🇭🇹'},
+    {'code': '+1', 'name': 'Jamaica', 'flag': '🇯🇲'},
+    {'code': '+1', 'name': 'Bahamas', 'flag': '🇧🇸'},
+    {'code': '+1', 'name': 'Barbados', 'flag': '🇧🇧'},
+    {'code': '+1', 'name': 'Trinidad and Tobago', 'flag': '🇹🇹'},
+    {'code': '+1', 'name': 'Dominican Republic', 'flag': '🇩🇴'},
+    {'code': '+53', 'name': 'Cuba', 'flag': '🇨🇺'},
+    {'code': '+57', 'name': 'Colombia', 'flag': '🇨🇴'},
+    {'code': '+58', 'name': 'Venezuela', 'flag': '🇻🇪'},
+    {'code': '+51', 'name': 'Peru', 'flag': '🇵🇪'},
+    {'code': '+56', 'name': 'Chile', 'flag': '🇨🇱'},
+    {'code': '+54', 'name': 'Argentina', 'flag': '🇦🇷'},
+    {'code': '+598', 'name': 'Uruguay', 'flag': '🇺🇾'},
+    {'code': '+595', 'name': 'Paraguay', 'flag': '🇵🇾'},
+    {'code': '+591', 'name': 'Bolivia', 'flag': '🇧🇴'},
+    {'code': '+593', 'name': 'Ecuador', 'flag': '🇪🇨'},
+    {'code': '+507', 'name': 'Panama', 'flag': '🇵🇦'},
+    {'code': '+506', 'name': 'Costa Rica', 'flag': '🇨🇷'},
+    {'code': '+505', 'name': 'Nicaragua', 'flag': '🇳🇮'},
+    {'code': '+504', 'name': 'Honduras', 'flag': '🇭🇳'},
+    {'code': '+503', 'name': 'El Salvador', 'flag': '🇸🇻'},
+    {'code': '+502', 'name': 'Guatemala', 'flag': '🇬🇹'},
+    {'code': '+501', 'name': 'Belize', 'flag': '🇧🇿'},
+    {'code': '+679', 'name': 'Fiji', 'flag': '🇫🇯'},
+    {'code': '+682', 'name': 'Cook Islands', 'flag': '🇨🇰'},
+    {'code': '+685', 'name': 'Samoa', 'flag': '🇼🇸'},
+    {'code': '+676', 'name': 'Tonga', 'flag': '🇹🇴'},
+    {'code': '+687', 'name': 'New Caledonia', 'flag': '🇳🇨'},
+    {'code': '+689', 'name': 'French Polynesia', 'flag': '🇵🇫'},
+  ];
 
   String t(String key) {
     final code = widget.languageCode.toUpperCase();
@@ -62,7 +218,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     _fullNameController.dispose();
     _usernameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
+    _phoneNumberController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     for (var c in _otpControllers) c.dispose();
@@ -161,8 +317,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   void _checkUsername() async {
     final username = _usernameController.text.trim();
-    if (username.length < 3) {
-      setState(() => _errorMessage = t('username_invalid'));
+    if (username.length < 5) {
+      setState(() => _errorMessage = t('username_invalid_min5'));
       return;
     }
     setState(() => _isCheckingUsername = true);
@@ -176,6 +332,99 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       });
       HapticFeedback.lightImpact();
     }
+  }
+
+  // Optimized country picker with search and smooth scrolling
+  void _showCountryPicker() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        String searchQuery = '';
+        List<Map<String, String>> filteredCountries = List.from(_allCountries);
+        
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.9,
+              minChildSize: 0.5,
+              maxChildSize: 0.9,
+              expand: false,
+              builder: (context, scrollController) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: inputBg,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: TextField(
+                          autofocus: false,
+                          onChanged: (value) {
+                            searchQuery = value.toLowerCase().trim();
+                            setModalState(() {
+                              if (searchQuery.isEmpty) {
+                                filteredCountries = List.from(_allCountries);
+                              } else {
+                                filteredCountries = _allCountries.where((country) {
+                                  final name = country['name']!.toLowerCase();
+                                  final code = country['code']!;
+                                  return name.contains(searchQuery) || code.contains(searchQuery);
+                                }).toList();
+                              }
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: t('search_country'),
+                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: filteredCountries.isEmpty
+                          ? Center(
+                              child: Text(
+                                t('no_results'),
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: scrollController,
+                              itemCount: filteredCountries.length,
+                              itemBuilder: (context, index) {
+                                final country = filteredCountries[index];
+                                return ListTile(
+                                  leading: Text(country['flag']!),
+                                  title: Text(country['name']!),
+                                  trailing: Text(country['code']!),
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedCountryCode = country['code']!;
+                                      _selectedCountryName = country['name']!;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   void _submit() {
@@ -192,6 +441,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     if (!_emailVerified) {
       setState(() => _errorMessage = t('email_not_verified'));
       return;
+    }
+    // Phone validation: number part must be at least 6 digits
+    final phoneNumber = _phoneNumberController.text.trim();
+    if (phoneNumber.isNotEmpty) {
+      if (!RegExp(r'^\d{6,15}$').hasMatch(phoneNumber)) {
+        setState(() => _errorMessage = t('phone_invalid'));
+        return;
+      }
     }
     if (_passwordController.text.length < 6) {
       setState(() => _errorMessage = t('password_short'));
@@ -264,7 +521,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile photo with tap to pick image
+                // Profile photo
                 Center(
                   child: GestureDetector(
                     onTap: _showImageSourceModal,
@@ -322,14 +579,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 const SizedBox(height: 14),
 
-                // Username
+                // Username (min 5 chars)
                 _label(t('username_label')),
                 Row(
                   children: [
                     Expanded(
                       child: _field(
                         controller: _usernameController,
-                        hint: t('username_hint'),
+                        hint: t('username_hint_min5'),
                         icon: Icons.alternate_email,
                         onChanged: (_) => setState(
                             () => _usernameAvailable = false),
@@ -407,13 +664,45 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 const SizedBox(height: 14),
 
-                // Phone (optional)
+                // Phone (optional) with country code picker
                 _label(t('phone_optional')),
-                _field(
-                  controller: _phoneController,
-                  hint: t('phone_hint'),
-                  icon: Icons.phone_outlined,
-                  keyboardType: TextInputType.phone,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Country code picker button
+                    GestureDetector(
+                      onTap: _showCountryPicker,
+                      child: Container(
+                        height: 50,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: inputBg,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _selectedCountryCode,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Phone number input
+                    Expanded(
+                      child: _field(
+                        controller: _phoneNumberController,
+                        hint: t('phone_hint'),
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 14),
@@ -458,7 +747,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 const SizedBox(height: 14),
 
-                // Birthday + Gender in row
+                // Birthday + Gender
                 Row(
                   children: [
                     Expanded(
@@ -628,39 +917,46 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     ),
                   ),
 
-                // Sign Up button
+                // Sign Up button (no splash)
                 SizedBox(
                   width: double.infinity,
                   height: 54,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999)),
-                      elevation: 4,
-                      shadowColor: primary.withOpacity(0.3),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2.5),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(t('sign_up'),
-                                  style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white)),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward,
-                                  color: Colors.white, size: 20),
-                            ],
+                  child: GestureDetector(
+                    onTap: _isLoading ? null : _submit,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: primary,
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 2.5),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(t('sign_up'),
+                                    style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white)),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_forward,
+                                    color: Colors.white, size: 20),
+                              ],
+                            ),
+                    ),
                   ),
                 ),
 
@@ -825,7 +1121,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 }
 
-// ── Translations (unchanged, all languages kept) ─────────────────────────────
+// ── Complete translations for ALL languages with new keys ───────────────────
 const Map<String, Map<String, String>> _tr = {
   'EN': {
     'create_account': 'Create Account',
@@ -836,8 +1132,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'Full name is required',
     'username_label': 'UNIQUE USERNAME',
     'username_hint': 'johndoe_connect',
+    'username_hint_min5': 'Minimum 5 characters',
     'username_required': 'Please check username availability',
     'username_invalid': 'Username must be at least 3 characters',
+    'username_invalid_min5': 'Username must be at least 5 characters',
     'username_taken': 'This username is already taken',
     'username_ok': 'Username is available!',
     'check': 'Check',
@@ -853,7 +1151,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'Verification code sent to your email!',
     'invalid_code': 'Please enter all 4 digits',
     'phone_optional': 'PHONE NUMBER (OPTIONAL)',
-    'phone_hint': '+1 (555) 000-0000',
+    'phone_hint': 'Enter phone number',
+    'phone_invalid': 'Enter a valid phone number (at least 6 digits)',
     'password_label': 'PASSWORD',
     'password_hint': 'New password (min 6 chars)',
     'confirm_password': 'Confirm password',
@@ -871,6 +1170,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'Terms of Service',
     'add_photo': 'Add photo',
     'camera': 'Camera',
+    'search_country': 'Search country or code...',
+    'no_results': 'No results found',
   },
   'BN': {
     'create_account': 'অ্যাকাউন্ট তৈরি',
@@ -881,8 +1182,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'পুরো নাম দিন',
     'username_label': 'ইউনিক ইউজারনেম',
     'username_hint': 'ইউজারনেম বেছে নিন',
+    'username_hint_min5': 'কমপক্ষে ৫ অক্ষর',
     'username_required': 'ইউজারনেম চেক করুন',
     'username_invalid': 'ইউজারনেম কমপক্ষে ৩ অক্ষরের হতে হবে',
+    'username_invalid_min5': 'ইউজারনেম কমপক্ষে ৫ অক্ষরের হতে হবে',
     'username_taken': 'এই ইউজারনেম আগেই নেওয়া হয়েছে',
     'username_ok': 'ইউজারনেম পাওয়া যাচ্ছে!',
     'check': 'চেক',
@@ -898,7 +1201,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'যাচাই কোড পাঠানো হয়েছে!',
     'invalid_code': 'সব ৪টি সংখ্যা দিন',
     'phone_optional': 'ফোন নম্বর (ঐচ্ছিক)',
-    'phone_hint': '+880 1XXX-XXXXXX',
+    'phone_hint': 'ফোন নম্বর লিখুন',
+    'phone_invalid': 'সঠিক ফোন নম্বর দিন (কমপক্ষে ৬ সংখ্যা)',
     'password_label': 'পাসওয়ার্ড',
     'password_hint': 'নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)',
     'confirm_password': 'পাসওয়ার্ড নিশ্চিত করুন',
@@ -916,6 +1220,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'শর্তাবলীতে সম্মত হচ্ছেন',
     'add_photo': 'ছবি যোগ করুন',
     'camera': 'ক্যামেরা',
+    'search_country': 'দেশ বা কোড খুঁজুন...',
+    'no_results': 'কোনো ফলাফল পাওয়া যায়নি',
   },
   'RU': {
     'create_account': 'Создать аккаунт',
@@ -926,8 +1232,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'Введите полное имя',
     'username_label': 'ИМЯ ПОЛЬЗОВАТЕЛЯ',
     'username_hint': 'ivan_connect',
+    'username_hint_min5': 'Минимум 5 символов',
     'username_required': 'Проверьте доступность имени',
     'username_invalid': 'Минимум 3 символа',
+    'username_invalid_min5': 'Имя пользователя должно содержать не менее 5 символов',
     'username_taken': 'Это имя уже занято',
     'username_ok': 'Имя доступно!',
     'check': 'Проверить',
@@ -943,7 +1251,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'Код отправлен!',
     'invalid_code': 'Введите все 4 цифры',
     'phone_optional': 'ТЕЛЕФОН (необязательно)',
-    'phone_hint': '+7 (XXX) XXX-XXXX',
+    'phone_hint': 'Введите номер телефона',
+    'phone_invalid': 'Введите корректный номер телефона (не менее 6 цифр)',
     'password_label': 'ПАРОЛЬ',
     'password_hint': 'Новый пароль (мин. 6 символов)',
     'confirm_password': 'Подтвердите пароль',
@@ -961,6 +1270,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'Условиями использования',
     'add_photo': 'Добавить фото',
     'camera': 'Камера',
+    'search_country': 'Поиск страны или кода...',
+    'no_results': 'Ничего не найдено',
   },
   'AR': {
     'create_account': 'إنشاء حساب',
@@ -971,8 +1282,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'الاسم الكامل مطلوب',
     'username_label': 'اسم المستخدم',
     'username_hint': 'اختر اسم مستخدم فريد',
+    'username_hint_min5': 'الحد الأدنى 5 أحرف',
     'username_required': 'تحقق من توفر اسم المستخدم',
     'username_invalid': '3 أحرف على الأقل',
+    'username_invalid_min5': 'اسم المستخدم يجب أن يكون 5 أحرف على الأقل',
     'username_taken': 'اسم المستخدم محجوز',
     'username_ok': 'اسم المستخدم متاح!',
     'check': 'تحقق',
@@ -988,7 +1301,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'تم إرسال الرمز!',
     'invalid_code': 'أدخل جميع الأرقام الأربعة',
     'phone_optional': 'الهاتف (اختياري)',
-    'phone_hint': '+966 5XX XXX XXXX',
+    'phone_hint': 'أدخل رقم الهاتف',
+    'phone_invalid': 'أدخل رقم هاتف صالحًا (6 أرقام على الأقل)',
     'password_label': 'كلمة المرور',
     'password_hint': 'كلمة مرور جديدة (6 أحرف)',
     'confirm_password': 'تأكيد كلمة المرور',
@@ -1006,6 +1320,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'شروط الخدمة',
     'add_photo': 'أضف صورة',
     'camera': 'الكاميرا',
+    'search_country': 'البحث عن بلد أو رمز...',
+    'no_results': 'لا توجد نتائج',
   },
   'ES': {
     'create_account': 'Crear cuenta',
@@ -1016,8 +1332,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'El nombre es requerido',
     'username_label': 'NOMBRE DE USUARIO',
     'username_hint': 'juan_connect',
+    'username_hint_min5': 'Mínimo 5 caracteres',
     'username_required': 'Verifica la disponibilidad',
     'username_invalid': 'Mínimo 3 caracteres',
+    'username_invalid_min5': 'El nombre de usuario debe tener al menos 5 caracteres',
     'username_taken': 'Este nombre ya está tomado',
     'username_ok': '¡Nombre disponible!',
     'check': 'Verificar',
@@ -1033,7 +1351,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': '¡Código enviado!',
     'invalid_code': 'Ingresa los 4 dígitos',
     'phone_optional': 'TELÉFONO (OPCIONAL)',
-    'phone_hint': '+1 (555) 000-0000',
+    'phone_hint': 'Ingresa número de teléfono',
+    'phone_invalid': 'Ingresa un número válido (al menos 6 dígitos)',
     'password_label': 'CONTRASEÑA',
     'password_hint': 'Nueva contraseña (mín. 6)',
     'confirm_password': 'Confirmar contraseña',
@@ -1051,6 +1370,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'Términos de Servicio',
     'add_photo': 'Agregar foto',
     'camera': 'Cámara',
+    'search_country': 'Buscar país o código...',
+    'no_results': 'No se encontraron resultados',
   },
   'FR': {
     'create_account': 'Créer un compte',
@@ -1061,8 +1382,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'Le nom est requis',
     'username_label': 'NOM D\'UTILISATEUR',
     'username_hint': 'jean_connect',
+    'username_hint_min5': 'Minimum 5 caractères',
     'username_required': 'Vérifiez la disponibilité',
     'username_invalid': 'Minimum 3 caractères',
+    'username_invalid_min5': 'Le nom d\'utilisateur doit comporter au moins 5 caractères',
     'username_taken': 'Ce nom est déjà pris',
     'username_ok': 'Nom disponible !',
     'check': 'Vérifier',
@@ -1078,7 +1401,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'Code envoyé !',
     'invalid_code': 'Entrez les 4 chiffres',
     'phone_optional': 'TÉLÉPHONE (OPTIONNEL)',
-    'phone_hint': '+33 X XX XX XX XX',
+    'phone_hint': 'Entrez le numéro de téléphone',
+    'phone_invalid': 'Entrez un numéro valide (au moins 6 chiffres)',
     'password_label': 'MOT DE PASSE',
     'password_hint': 'Nouveau mot de passe (min. 6)',
     'confirm_password': 'Confirmer le mot de passe',
@@ -1096,6 +1420,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'Conditions d\'utilisation',
     'add_photo': 'Ajouter une photo',
     'camera': 'Appareil photo',
+    'search_country': 'Rechercher un pays ou un code...',
+    'no_results': 'Aucun résultat trouvé',
   },
   'HI': {
     'create_account': 'खाता बनाएं',
@@ -1106,8 +1432,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'पूरा नाम आवश्यक है',
     'username_label': 'यूजरनेम',
     'username_hint': 'ram_connect',
+    'username_hint_min5': 'कम से कम 5 अक्षर',
     'username_required': 'यूजरनेम उपलब्धता जांचें',
     'username_invalid': 'कम से कम 3 अक्षर',
+    'username_invalid_min5': 'यूजरनेम कम से कम 5 अक्षर का होना चाहिए',
     'username_taken': 'यह यूजरनेम पहले से लिया गया है',
     'username_ok': 'यूजरनेम उपलब्ध है!',
     'check': 'जांचें',
@@ -1123,7 +1451,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'कोड भेज दिया गया!',
     'invalid_code': 'सभी 4 अंक दर्ज करें',
     'phone_optional': 'फोन नंबर (वैकल्पिक)',
-    'phone_hint': '+91 XXXXX XXXXX',
+    'phone_hint': 'फोन नंबर दर्ज करें',
+    'phone_invalid': 'एक वैध फोन नंबर दर्ज करें (कम से कम 6 अंक)',
     'password_label': 'पासवर्ड',
     'password_hint': 'नया पासवर्ड (न्यूनतम 6)',
     'confirm_password': 'पासवर्ड की पुष्टि करें',
@@ -1141,6 +1470,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'सेवा शर्तों से सहमत हैं',
     'add_photo': 'फोटो जोड़ें',
     'camera': 'कैमरा',
+    'search_country': 'देश या कोड खोजें...',
+    'no_results': 'कोई परिणाम नहीं मिला',
   },
   'PT': {
     'create_account': 'Criar conta',
@@ -1151,8 +1482,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'Nome é obrigatório',
     'username_label': 'NOME DE USUÁRIO',
     'username_hint': 'joao_connect',
+    'username_hint_min5': 'Mínimo 5 caracteres',
     'username_required': 'Verifique a disponibilidade',
     'username_invalid': 'Mínimo 3 caracteres',
+    'username_invalid_min5': 'O nome de usuário deve ter pelo menos 5 caracteres',
     'username_taken': 'Este nome já está em uso',
     'username_ok': 'Nome disponível!',
     'check': 'Verificar',
@@ -1168,7 +1501,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'Código enviado!',
     'invalid_code': 'Digite os 4 dígitos',
     'phone_optional': 'TELEFONE (OPCIONAL)',
-    'phone_hint': '+55 (XX) XXXXX-XXXX',
+    'phone_hint': 'Digite o número de telefone',
+    'phone_invalid': 'Digite um número válido (pelo menos 6 dígitos)',
     'password_label': 'SENHA',
     'password_hint': 'Nova senha (mín. 6)',
     'confirm_password': 'Confirmar senha',
@@ -1186,6 +1520,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': 'Termos de Serviço',
     'add_photo': 'Adicionar foto',
     'camera': 'Câmera',
+    'search_country': 'Pesquisar país ou código...',
+    'no_results': 'Nenhum resultado encontrado',
   },
   'ZH': {
     'create_account': '创建账户',
@@ -1196,8 +1532,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': '全名为必填项',
     'username_label': '用户名',
     'username_hint': 'zhang_connect',
+    'username_hint_min5': '至少5个字符',
     'username_required': '请检查用户名可用性',
     'username_invalid': '至少3个字符',
+    'username_invalid_min5': '用户名必须至少5个字符',
     'username_taken': '此用户名已被使用',
     'username_ok': '用户名可用！',
     'check': '检查',
@@ -1213,7 +1551,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': '验证码已发送！',
     'invalid_code': '请输入所有4位数字',
     'phone_optional': '手机号（可选）',
-    'phone_hint': '+86 XXX XXXX XXXX',
+    'phone_hint': '输入手机号码',
+    'phone_invalid': '请输入有效的手机号码（至少6位数字）',
     'password_label': '密码',
     'password_hint': '新密码（最少6位）',
     'confirm_password': '确认密码',
@@ -1231,6 +1570,8 @@ const Map<String, Map<String, String>> _tr = {
     'terms': '服务条款',
     'add_photo': '添加照片',
     'camera': '相机',
+    'search_country': '搜索国家或代码...',
+    'no_results': '未找到结果',
   },
   'JA': {
     'create_account': 'アカウント作成',
@@ -1241,8 +1582,10 @@ const Map<String, Map<String, String>> _tr = {
     'fullname_required': 'フルネームは必須です',
     'username_label': 'ユーザー名',
     'username_hint': 'yamada_connect',
+    'username_hint_min5': '最小5文字',
     'username_required': 'ユーザー名の確認をしてください',
     'username_invalid': '3文字以上必要です',
+    'username_invalid_min5': 'ユーザー名は5文字以上必要です',
     'username_taken': 'このユーザー名は使用中です',
     'username_ok': 'ユーザー名は使用可能です！',
     'check': '確認',
@@ -1258,7 +1601,8 @@ const Map<String, Map<String, String>> _tr = {
     'code_sent': 'コードを送信しました！',
     'invalid_code': '4桁すべて入力してください',
     'phone_optional': '電話番号（任意）',
-    'phone_hint': '+81 XX-XXXX-XXXX',
+    'phone_hint': '電話番号を入力',
+    'phone_invalid': '有効な電話番号を入力してください（6桁以上）',
     'password_label': 'パスワード',
     'password_hint': '新しいパスワード（6文字以上）',
     'confirm_password': 'パスワードの確認',
@@ -1276,5 +1620,7 @@ const Map<String, Map<String, String>> _tr = {
     'terms': '利用規約に同意します',
     'add_photo': '写真を追加',
     'camera': 'カメラ',
+    'search_country': '国名またはコードを検索...',
+    'no_results': '結果が見つかりません',
   },
 };
