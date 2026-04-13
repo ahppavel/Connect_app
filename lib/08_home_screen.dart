@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '09_profile_screen.dart';
 
-
 class HomeScreen extends StatefulWidget {
   final String languageCode;
   final String languageName;
   final String fullName;
   final String username;
+  final String email;
 
   const HomeScreen({
     super.key,
@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
     required this.languageName,
     required this.fullName,
     required this.username,
+    required this.email,
   });
 
   @override
@@ -57,25 +58,47 @@ class ChatPreview {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentTab = 0;
+  bool _isDarkMode = false;
+
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  static const Color primary = Color(0xFF9d4d36);
-  static const Color bg = Color(0xFFF7F9FC);
-  static const Color cardBg = Color(0xFFEEEFF4);
-  static const Color onlineGreen = Color(0xFF25D366);
-  static const Color seenYellow = Color(0xFFFFD700);
+  late String _displayName;
+  late String _displayUsername;
 
-  // TODO: Replace with real Firebase data later
-  // Empty list — chats will appear when users actually message each other
+  static const Color primary = Color(0xFF9d4d36);
+  static const Color lightBg = Color(0xFFF7F9FC);
+  static const Color lightCardBg = Color(0xFFEEEFF4);
+  static const Color onlineGreen = Color(0xFF25D366);
+
   final List<ChatPreview> _chats = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _displayName = widget.fullName;
+    _displayUsername = widget.username;
+  }
+
+  Color get bg => _isDarkMode ? const Color(0xFF121212) : lightBg;
+  Color get cardBg => _isDarkMode ? const Color(0xFF1E1E1E) : lightCardBg;
+  Color get navBg => _isDarkMode ? const Color(0xFF181818) : Colors.white;
+  Color get textPrimary =>
+      _isDarkMode ? Colors.white : const Color(0xFF191c1e);
+  Color get textSecondary =>
+      _isDarkMode ? Colors.grey[400]! : Colors.grey[500]!;
+  Color get iconMuted => _isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+  Color get dividerColor =>
+      _isDarkMode ? Colors.white.withOpacity(0.06) : Colors.grey[200]!;
 
   List<ChatPreview> get _filteredChats {
     if (_searchQuery.isEmpty) return _chats;
     return _chats
-        .where((c) =>
-            c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            c.lastMessage.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (c) =>
+              c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              c.lastMessage.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
         .toList();
   }
 
@@ -90,6 +113,11 @@ class _HomeScreenState extends State<HomeScreen> {
         'no_chats': 'No chats yet',
         'no_chats_sub': 'Tap the pencil button to start a conversation!',
         'no_results': 'No results found',
+        'day_mode': 'Day mode',
+        'night_mode': 'Night mode',
+        'new_group': 'New group',
+        'new_group_title': 'New Group',
+        'new_group_sub': 'Create your new group here',
       },
       'BN': {
         'chats': 'চ্যাট',
@@ -100,6 +128,11 @@ class _HomeScreenState extends State<HomeScreen> {
         'no_chats': 'এখনো কোনো চ্যাট নেই',
         'no_chats_sub': 'নতুন কথোপকথন শুরু করতে পেন্সিল বাটন চাপুন!',
         'no_results': 'কোনো ফলাফল পাওয়া যায়নি',
+        'day_mode': 'ডে মোড',
+        'night_mode': 'নাইট মোড',
+        'new_group': 'নতুন গ্রুপ',
+        'new_group_title': 'নতুন গ্রুপ',
+        'new_group_sub': 'এখানে নতুন গ্রুপ তৈরি করুন',
       },
       'RU': {
         'chats': 'Чаты',
@@ -108,8 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'settings': 'Настройки',
         'search': 'Поиск или новый чат',
         'no_chats': 'Нет чатов',
-        'no_chats_sub': 'Нажмите кнопку карандаша, чтобы начать!',
+        'no_chats_sub': 'Нажмите карандаш!',
         'no_results': 'Ничего не найдено',
+        'day_mode': 'Дневной режим',
+        'night_mode': 'Ночной режим',
+        'new_group': 'Новая группа',
+        'new_group_title': 'Новая группа',
+        'new_group_sub': 'Создайте новую группу здесь',
       },
       'AR': {
         'chats': 'المحادثات',
@@ -118,8 +156,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'settings': 'الإعدادات',
         'search': 'بحث أو بدء محادثة',
         'no_chats': 'لا توجد محادثات',
-        'no_chats_sub': 'اضغط على زر القلم لبدء محادثة!',
+        'no_chats_sub': 'اضغط على القلم!',
         'no_results': 'لا توجد نتائج',
+        'day_mode': 'الوضع النهاري',
+        'night_mode': 'الوضع الليلي',
+        'new_group': 'مجموعة جديدة',
+        'new_group_title': 'مجموعة جديدة',
+        'new_group_sub': 'أنشئ مجموعتك الجديدة هنا',
       },
       'ES': {
         'chats': 'Chats',
@@ -128,8 +171,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'settings': 'Ajustes',
         'search': 'Buscar o iniciar chat',
         'no_chats': 'Sin chats aún',
-        'no_chats_sub': '¡Toca el botón de lápiz para comenzar!',
+        'no_chats_sub': '¡Toca el lápiz!',
         'no_results': 'Sin resultados',
+        'day_mode': 'Modo día',
+        'night_mode': 'Modo noche',
+        'new_group': 'Nuevo grupo',
+        'new_group_title': 'Nuevo grupo',
+        'new_group_sub': 'Crea tu nuevo grupo aquí',
       },
       'FR': {
         'chats': 'Discussions',
@@ -137,9 +185,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'calls': 'Appels',
         'settings': 'Paramètres',
         'search': 'Rechercher ou nouveau chat',
-        'no_chats': 'Pas encore de discussions',
-        'no_chats_sub': 'Appuyez sur le crayon pour commencer!',
+        'no_chats': 'Pas de discussions',
+        'no_chats_sub': 'Appuyez sur le crayon!',
         'no_results': 'Aucun résultat',
+        'day_mode': 'Mode jour',
+        'night_mode': 'Mode nuit',
+        'new_group': 'Nouveau groupe',
+        'new_group_title': 'Nouveau groupe',
+        'new_group_sub': 'Créez votre nouveau groupe ici',
       },
       'HI': {
         'chats': 'चैट',
@@ -147,9 +200,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'calls': 'कॉल',
         'settings': 'सेटिंग',
         'search': 'खोजें या नई चैट शुरू करें',
-        'no_chats': 'अभी कोई चैट नहीं',
-        'no_chats_sub': 'बातचीत शुरू करने के लिए पेंसिल बटन दबाएं!',
+        'no_chats': 'कोई चैट नहीं',
+        'no_chats_sub': 'पेंसिल बटन दबाएं!',
         'no_results': 'कोई परिणाम नहीं',
+        'day_mode': 'डे मोड',
+        'night_mode': 'नाइट मोड',
+        'new_group': 'नया ग्रुप',
+        'new_group_title': 'नया ग्रुप',
+        'new_group_sub': 'यहाँ नया ग्रुप बनाएं',
       },
       'PT': {
         'chats': 'Conversas',
@@ -157,9 +215,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'calls': 'Chamadas',
         'settings': 'Config.',
         'search': 'Pesquisar ou nova conversa',
-        'no_chats': 'Sem conversas ainda',
-        'no_chats_sub': 'Toque no lápis para começar!',
+        'no_chats': 'Sem conversas',
+        'no_chats_sub': 'Toque no lápis!',
         'no_results': 'Sem resultados',
+        'day_mode': 'Modo dia',
+        'night_mode': 'Modo noite',
+        'new_group': 'Novo grupo',
+        'new_group_title': 'Novo grupo',
+        'new_group_sub': 'Crie seu novo grupo aqui',
       },
       'ZH': {
         'chats': '聊天',
@@ -168,8 +231,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'settings': '设置',
         'search': '搜索或开始新聊天',
         'no_chats': '暂无聊天',
-        'no_chats_sub': '点击铅笔按钮开始对话！',
+        'no_chats_sub': '点击铅笔按钮开始！',
         'no_results': '未找到结果',
+        'day_mode': '日间模式',
+        'night_mode': '夜间模式',
+        'new_group': '新建群组',
+        'new_group_title': '新建群组',
+        'new_group_sub': '在这里创建你的新群组',
       },
       'JA': {
         'chats': 'チャット',
@@ -178,12 +246,62 @@ class _HomeScreenState extends State<HomeScreen> {
         'settings': '設定',
         'search': '検索または新しいチャット',
         'no_chats': 'チャットはまだありません',
-        'no_chats_sub': '鉛筆ボタンをタップして会話を始めましょう！',
+        'no_chats_sub': '鉛筆ボタンをタップ！',
         'no_results': '結果が見つかりません',
+        'day_mode': 'デイモード',
+        'night_mode': 'ナイトモード',
+        'new_group': '新しいグループ',
+        'new_group_title': '新しいグループ',
+        'new_group_sub': 'ここで新しいグループを作成します',
       },
     };
+
     final code = widget.languageCode.toUpperCase();
     return tr[code]?[key] ?? tr['EN']![key]!;
+  }
+
+  void _openProfile() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProfileScreen(
+          languageCode: widget.languageCode,
+          initialName: _displayName,
+          initialUsername: _displayUsername,
+          initialEmail: widget.email,
+          initialBio: '',
+        ),
+      ),
+    );
+
+    if (result != null && result is Map<String, String>) {
+      setState(() {
+        if (result['name'] != null) _displayName = result['name']!;
+        if (result['username'] != null) {
+          _displayUsername = result['username']!;
+        }
+      });
+    }
+  }
+
+  void _onMenuSelected(String value) {
+    if (value == 'theme') {
+      setState(() {
+        _isDarkMode = !_isDarkMode;
+      });
+    } else if (value == 'group') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewGroupScreen(
+            languageCode: widget.languageCode,
+            titleText: _t('new_group_title'),
+            subtitleText: _t('new_group_sub'),
+            isDarkMode: _isDarkMode,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -199,6 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: Text(
           'Connect',
@@ -209,21 +328,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          // Profile avatar
           GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ProfileScreen(
-                    languageCode: widget.languageCode,
-                    initialName: widget.fullName,
-                    initialUsername: widget.username,
-                    initialEmail: '', // TODO: Add email when available
-                  ),
-                ),
-              );
-            },
+            onTap: _openProfile,
             child: Container(
               margin: const EdgeInsets.only(right: 4),
               width: 38,
@@ -232,13 +338,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
                 color: primary,
                 border: Border.all(
-                    color: primary.withOpacity(0.3), width: 2),
+                  color: primary.withOpacity(0.3),
+                  width: 2,
+                ),
               ),
               child: Center(
                 child: Text(
-                  widget.fullName.isNotEmpty
-                      ? widget.fullName[0].toUpperCase()
-                      : '?',
+                  _displayName.isNotEmpty ? _displayName[0].toUpperCase() : '?',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -248,32 +354,58 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.more_vert,
-                color: Colors.grey[600], size: 24),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ProfileScreen(
-                    languageCode: widget.languageCode,
-                    initialName: widget.fullName,
-                    initialUsername: widget.username,
-                    initialEmail: '', // TODO: Add email when available
-                  ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: iconMuted, size: 24),
+            color: navBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            onSelected: _onMenuSelected,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'theme',
+                child: Row(
+                  children: [
+                    Icon(
+                      _isDarkMode
+                          ? Icons.light_mode_outlined
+                          : Icons.dark_mode_outlined,
+                      color: primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _isDarkMode ? _t('day_mode') : _t('night_mode'),
+                      style: TextStyle(color: textPrimary),
+                    ),
+                  ],
                 ),
-              );
-            },
+              ),
+              PopupMenuItem(
+                value: 'group',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.group_add_outlined,
+                      color: primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _t('new_group'),
+                      style: TextStyle(color: textPrimary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
-
       body: Column(
         children: [
-          // Search bar
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Container(
               height: 46,
               decoration: BoxDecoration(
@@ -282,20 +414,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: TextField(
                 controller: _searchController,
-                style: const TextStyle(
-                    color: Color(0xFF191c1e), fontSize: 15),
-                onChanged: (val) =>
-                    setState(() => _searchQuery = val),
+                style: TextStyle(color: textPrimary, fontSize: 15),
+                onChanged: (val) => setState(() => _searchQuery = val),
                 decoration: InputDecoration(
                   hintText: _t('search'),
-                  hintStyle: TextStyle(
-                      color: Colors.grey[400], fontSize: 14),
-                  prefixIcon: Icon(Icons.search,
-                      color: Colors.grey[400], size: 20),
+                  hintStyle: TextStyle(color: textSecondary, fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: textSecondary, size: 20),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: Icon(Icons.close,
-                              color: Colors.grey[400], size: 18),
+                          icon: Icon(Icons.close, color: textSecondary, size: 18),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
@@ -303,16 +430,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 13),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 13),
                 ),
               ),
             ),
           ),
-
           const SizedBox(height: 4),
-
-          // Chat list
           Expanded(
             child: _filteredChats.isEmpty
                 ? _buildEmptyState()
@@ -321,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: _filteredChats.length,
                     separatorBuilder: (_, __) => Divider(
                       height: 0.5,
-                      color: Colors.grey[200],
+                      color: dividerColor,
                       indent: 84,
                     ),
                     itemBuilder: (context, index) =>
@@ -330,14 +453,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
-      // Bottom navigation
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: navBg,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withOpacity(_isDarkMode ? 0.18 : 0.06),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -349,26 +470,40 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _navItem(0, Icons.chat_bubble_rounded,
-                    Icons.chat_bubble_outline_rounded, _t('chats')),
-                _navItem(1, Icons.auto_stories,
-                    Icons.auto_stories_outlined, _t('stories')),
-                _navItem(2, Icons.call_rounded,
-                    Icons.call_outlined, _t('calls')),
-                _navItem(3, Icons.settings_rounded,
-                    Icons.settings_outlined, _t('settings')),
+                _navItem(
+                  0,
+                  Icons.chat_bubble_rounded,
+                  Icons.chat_bubble_outline_rounded,
+                  _t('chats'),
+                ),
+                _navItem(
+                  1,
+                  Icons.auto_stories,
+                  Icons.auto_stories_outlined,
+                  _t('stories'),
+                ),
+                _navItem(
+                  2,
+                  Icons.call_rounded,
+                  Icons.call_outlined,
+                  _t('calls'),
+                ),
+                _navItem(
+                  3,
+                  Icons.settings_rounded,
+                  Icons.settings_outlined,
+                  _t('settings'),
+                ),
               ],
             ),
           ),
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: primary,
         elevation: 4,
-        child: const Icon(Icons.edit_outlined,
-            color: Colors.white, size: 24),
+        child: const Icon(Icons.edit_outlined, color: Colors.white, size: 24),
       ),
     );
   }
@@ -395,11 +530,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              _searchQuery.isNotEmpty
-                  ? _t('no_results')
-                  : _t('no_chats'),
-              style: const TextStyle(
-                color: Color(0xFF191c1e),
+              _searchQuery.isNotEmpty ? _t('no_results') : _t('no_chats'),
+              style: TextStyle(
+                color: textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -410,7 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _t('no_chats_sub'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.grey[500],
+                  color: textSecondary,
                   fontSize: 14,
                   height: 1.5,
                 ),
@@ -422,19 +555,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _navItem(int index, IconData activeIcon,
-      IconData inactiveIcon, String label) {
+  Widget _navItem(
+    int index,
+    IconData activeIcon,
+    IconData inactiveIcon,
+    String label,
+  ) {
     final isActive = _currentTab == index;
     return GestureDetector(
       onTap: () => setState(() => _currentTab = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 20, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive
-              ? primary.withOpacity(0.1)
-              : Colors.transparent,
+          color: isActive ? primary.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(999),
         ),
         child: Column(
@@ -442,7 +576,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(
               isActive ? activeIcon : inactiveIcon,
-              color: isActive ? primary : Colors.grey[400],
+              color: isActive ? primary : textSecondary,
               size: 24,
             ),
             const SizedBox(height: 2),
@@ -450,10 +584,8 @@ class _HomeScreenState extends State<HomeScreen> {
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: isActive ? primary : Colors.grey[400],
-                fontWeight: isActive
-                    ? FontWeight.w600
-                    : FontWeight.w400,
+                color: isActive ? primary : textSecondary,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
           ],
@@ -467,11 +599,9 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {},
       splashColor: primary.withOpacity(0.05),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            // Avatar
             Stack(
               children: [
                 Container(
@@ -502,57 +632,37 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         color: onlineGreen,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                            color: bg, width: 2),
+                        border: Border.all(color: bg, width: 2),
                       ),
                     ),
                   ),
               ],
             ),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Row(
-                          children: [
-                            if (chat.isGroup)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 4),
-                                child: Icon(Icons.group,
-                                    size: 14,
-                                    color: Colors.grey[400]),
-                              ),
-                            Flexible(
-                              child: Text(
-                                chat.name,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: const Color(0xFF191c1e),
-                                  fontWeight: chat.unreadCount > 0
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          chat.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: textPrimary,
+                            fontWeight: chat.unreadCount > 0
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                       Text(
                         chat.time,
                         style: TextStyle(
-                          color: chat.unreadCount > 0
-                              ? primary
-                              : Colors.grey[400],
+                          color: chat.unreadCount > 0 ? primary : textSecondary,
                           fontSize: 12,
                           fontWeight: chat.unreadCount > 0
                               ? FontWeight.w600
@@ -561,50 +671,34 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 3),
-
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Row(
-                          children: [
-                            if (chat.isMe && !chat.isDeleted)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 4),
-                                child: _buildTick(chat.status),
-                              ),
-                            Expanded(
-                              child: Text(
-                                chat.lastMessage,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: chat.isDeleted
-                                      ? Colors.grey[400]
-                                      : chat.isMissedCall
-                                          ? Colors.redAccent
-                                          : Colors.grey[500],
-                                  fontSize: 13,
-                                  fontStyle: chat.isDeleted
-                                      ? FontStyle.italic
-                                      : FontStyle.normal,
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          chat.lastMessage,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: chat.isMissedCall
+                                ? Colors.redAccent
+                                : textSecondary,
+                            fontSize: 13,
+                            fontStyle: chat.isDeleted
+                                ? FontStyle.italic
+                                : FontStyle.normal,
+                          ),
                         ),
                       ),
                       if (chat.unreadCount > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 3),
+                            horizontal: 7,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: primary,
-                            borderRadius:
-                                BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             chat.unreadCount > 99
@@ -627,36 +721,103 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
-  Widget _buildTick(MessageStatus status) {
-    switch (status) {
-      case MessageStatus.sending:
-        return Icon(Icons.access_time,
-            size: 14, color: Colors.grey[400]);
-      case MessageStatus.sent:
-        return Icon(Icons.check, size: 14, color: Colors.grey[400]);
-      case MessageStatus.delivered:
-        return Stack(
-          children: [
-            Icon(Icons.check, size: 14, color: Colors.grey[400]),
-            Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.check,
-                  size: 14, color: Colors.grey[400]),
-            ),
-          ],
-        );
-      case MessageStatus.seen:
-        return Stack(
-          children: const [
-            Icon(Icons.check, size: 14, color: seenYellow),
-            Padding(
-              padding: EdgeInsets.only(left: 6),
-              child: Icon(Icons.check,
-                  size: 14, color: seenYellow),
-            ),
-          ],
-        );
-    }
+class NewGroupScreen extends StatelessWidget {
+  final String languageCode;
+  final String titleText;
+  final String subtitleText;
+  final bool isDarkMode;
+
+  const NewGroupScreen({
+    super.key,
+    required this.languageCode,
+    required this.titleText,
+    required this.subtitleText,
+    required this.isDarkMode,
+  });
+
+  static const Color primary = Color(0xFF9d4d36);
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF7F9FC);
+    final cardBg = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textPrimary =
+        isDarkMode ? Colors.white : const Color(0xFF191c1e);
+    final textSecondary =
+        isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+
+    return Scaffold(
+      backgroundColor: bg,
+      appBar: AppBar(
+        backgroundColor: bg,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: primary),
+        title: Text(
+          titleText,
+          style: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+        ),
+      ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.05),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.group_add_outlined,
+                  color: primary,
+                  size: 34,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                titleText,
+                style: TextStyle(
+                  color: textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                subtitleText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: textSecondary,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

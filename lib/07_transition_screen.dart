@@ -147,6 +147,7 @@ class TransitionScreen extends StatefulWidget {
   final String languageName;
   final String fullName;
   final String username;
+  final String email;
 
   const TransitionScreen({
     super.key,
@@ -154,6 +155,7 @@ class TransitionScreen extends StatefulWidget {
     required this.languageName,
     required this.fullName,
     required this.username,
+    required this.email,
   });
 
   @override
@@ -230,6 +232,7 @@ class _TransitionScreenState extends State<TransitionScreen>
             languageName: widget.languageName,
             fullName: widget.fullName,
             username: widget.username,
+            email: widget.email,
           ),
         ),
       );

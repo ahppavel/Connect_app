@@ -8,6 +8,7 @@ class AccountCreatedScreen extends StatefulWidget {
   final String languageName;
   final String fullName;
   final String username;
+  final String email;
 
   const AccountCreatedScreen({
     super.key,
@@ -15,6 +16,7 @@ class AccountCreatedScreen extends StatefulWidget {
     required this.languageName,
     required this.fullName,
     required this.username,
+    required this.email,
   });
 
   @override
@@ -258,6 +260,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                               languageName: widget.languageName,
                               fullName: widget.fullName,
                               username: widget.username,
+                              email: widget.email,
                             ),
                             transitionsBuilder: (_, anim, __, child) =>
                                 FadeTransition(opacity: anim, child: child),
