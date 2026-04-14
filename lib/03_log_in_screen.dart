@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '04_forgot_password_screen.dart';
 import '05_create_account_screen.dart';
+import '07_transition_screen.dart';   // adjust path if needed
 
 // ── Complete translations for all languages ──────────────────────────────────
 const Map<String, Map<String, String>> _translations = {
@@ -26,6 +27,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'Username must be at least 3 characters',
     'password_empty': 'Please enter your password',
     'password_short': 'Password must be at least 6 characters',
+    'login_success': 'Login Successful',
   },
   'BN': {
     'email': 'ইমেইল',
@@ -48,6 +50,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'ইউজারনেম কমপক্ষে ৩ অক্ষরের হতে হবে',
     'password_empty': 'আপনার পাসওয়ার্ড দিন',
     'password_short': 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে',
+    'login_success': 'লগ ইন সফল হয়েছে',
   },
   'RU': {
     'email': 'Эл. почта',
@@ -70,6 +73,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'Имя пользователя должно содержать не менее 3 символов',
     'password_empty': 'Пожалуйста, введите пароль',
     'password_short': 'Пароль должен содержать не менее 6 символов',
+    'login_success': 'Вход выполнен успешно',
   },
   'AR': {
     'email': 'البريد الإلكتروني',
@@ -92,6 +96,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل',
     'password_empty': 'الرجاء إدخال كلمة المرور',
     'password_short': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+    'login_success': 'تم تسجيل الدخول بنجاح',
   },
   'ES': {
     'email': 'Correo',
@@ -114,6 +119,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'El nombre de usuario debe tener al menos 3 caracteres',
     'password_empty': 'Por favor ingresa tu contraseña',
     'password_short': 'La contraseña debe tener al menos 6 caracteres',
+    'login_success': 'Inicio de sesión exitoso',
   },
   'FR': {
     'email': 'E-mail',
@@ -136,6 +142,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': "Le nom d'utilisateur doit comporter au moins 3 caractères",
     'password_empty': 'Veuillez entrer votre mot de passe',
     'password_short': 'Le mot de passe doit comporter au moins 6 caractères',
+    'login_success': 'Connexion réussie',
   },
   'HI': {
     'email': 'ईमेल',
@@ -158,6 +165,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'उपयोगकर्ता नाम कम से कम 3 अक्षर का होना चाहिए',
     'password_empty': 'कृपया अपना पासवर्ड दर्ज करें',
     'password_short': 'पासवर्ड कम से कम 6 अक्षर का होना चाहिए',
+    'login_success': 'लॉगिन सफल हुआ',
   },
   'PT': {
     'email': 'E-mail',
@@ -180,6 +188,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'O nome de usuário deve ter pelo menos 3 caracteres',
     'password_empty': 'Por favor, digite sua senha',
     'password_short': 'A senha deve ter pelo menos 6 caracteres',
+    'login_success': 'Login bem-sucedido',
   },
   'ZH': {
     'email': '电子邮件',
@@ -202,6 +211,7 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': '用户名必须至少3个字符',
     'password_empty': '请输入您的密码',
     'password_short': '密码必须至少6个字符',
+    'login_success': '登录成功',
   },
   'JA': {
     'email': 'メール',
@@ -224,10 +234,10 @@ const Map<String, Map<String, String>> _translations = {
     'username_invalid': 'ユーザー名は3文字以上である必要があります',
     'password_empty': 'パスワードを入力してください',
     'password_short': 'パスワードは6文字以上である必要があります',
+    'login_success': 'ログイン成功',
   },
 };
 
-// Enum for login method
 enum LoginMethod { email, phone, username }
 
 class LoginScreen extends StatefulWidget {
@@ -252,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String _identifierError = '';
   String _passwordError = '';
 
-  LoginMethod _selectedMethod = LoginMethod.email; // default to email
+  LoginMethod _selectedMethod = LoginMethod.email;
 
   static const Color primaryBrown = Color(0xFF9d4d36);
   static const Color lightBg = Color(0xFFF7F9FC);
@@ -265,7 +275,112 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool get isRTL => widget.languageCode.toUpperCase() == 'AR';
 
-  void _validateAndLogin() {
+  // Build user data from identifier (demo only)
+  Map<String, String> _buildUserData(String identifier) {
+    switch (_selectedMethod) {
+      case LoginMethod.email:
+        final email = identifier;
+        final username = email.split('@').first;
+        final fullName = username;
+        return {'fullName': fullName, 'username': username, 'email': email};
+      case LoginMethod.phone:
+        final phone = identifier;
+        final username = phone;
+        final fullName = 'User';
+        final email = '$phone@phone.local';
+        return {'fullName': fullName, 'username': username, 'email': email};
+      case LoginMethod.username:
+        final username = identifier;
+        final fullName = username;
+        final email = '$username@username.local';
+        return {'fullName': fullName, 'username': username, 'email': email};
+    }
+  }
+
+  // New animated success message with better design
+  void _showTopSuccessMessage() {
+    final overlay = Overlay.of(context);
+
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 70,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.8, end: 1.0),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutBack,
+            builder: (context, scale, child) {
+              return Transform.scale(
+                scale: scale,
+                child: Opacity(
+                  opacity: scale.clamp(0.0, 1.0),
+                  child: child,
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.10),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+                border: Border.all(
+                  color: primaryBrown.withOpacity(0.15),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: primaryBrown.withOpacity(0.12),
+                    ),
+                    child: const Icon(
+                      Icons.check_rounded,
+                      color: primaryBrown,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      t('login_success'),
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
+  }
+
+  void _validateAndLogin() async {
     setState(() {
       _identifierError = '';
       _passwordError = '';
@@ -275,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text;
     bool hasError = false;
 
-    // Validate based on selected method
+    // Validation (same as before)
     switch (_selectedMethod) {
       case LoginMethod.email:
         if (identifier.isEmpty) {
@@ -314,16 +429,37 @@ class _LoginScreenState extends State<LoginScreen> {
       hasError = true;
     }
 
-    if (!hasError) {
-      setState(() => _isLoading = true);
-      // TODO: Connect Firebase Auth here
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _isLoading = false);
-      });
-    }
+    if (hasError) return;
+
+    setState(() => _isLoading = true);
+    await Future.delayed(const Duration(seconds: 2)); // simulate auth
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    _showTopSuccessMessage();
+
+    final userData = _buildUserData(identifier);
+
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TransitionScreen(
+          languageCode: widget.languageCode,
+          languageName: widget.languageName,
+          fullName: userData['fullName']!,
+          username: userData['username']!,
+          email: userData['email']!,
+        ),
+      ),
+    );
   }
 
-  // Helper to get hint text based on selected method
+  // ─────────────── UI Getters ───────────────
   String get _identifierHint {
     switch (_selectedMethod) {
       case LoginMethod.email:
@@ -335,7 +471,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Helper to get keyboard type
   TextInputType get _keyboardType {
     switch (_selectedMethod) {
       case LoginMethod.email:
@@ -347,7 +482,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Helper to get prefix icon
   IconData get _prefixIcon {
     switch (_selectedMethod) {
       case LoginMethod.email:
@@ -359,6 +493,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // ─────────────── UI Building ───────────────
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -373,7 +508,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 16),
 
-                // ── Top bar ────────────────────────────────────────
+                // Top bar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -385,21 +520,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: lightBg,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.language,
-                                size: 16, color: Colors.black87),
+                            const Icon(Icons.language, size: 16, color: Colors.black87),
                             const SizedBox(width: 6),
                             Text(
                               widget.languageName,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black87),
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
                             ),
                           ],
                         ),
@@ -410,21 +542,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 32),
 
-                // ── App name ───────────────────────────────────────
+                // App name
                 Center(
                   child: Text(
                     'Connect',
                     style: GoogleFonts.dancingScript(
                       fontSize: 42,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF9d4d36),
+                      color: primaryBrown,
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 40),
 
-                // ── Login Method Selector (Email / Phone / Username) ──
+                // Login method selector
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -442,7 +574,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 16),
 
-                // ── Identifier field (email/phone/username) ─────────
+                // Identifier field
                 _buildInputField(
                   controller: _identifierController,
                   hint: _identifierHint,
@@ -453,15 +585,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 14),
 
-                // ── Password field ─────────────────────────────────
+                // Password field
                 _buildPasswordField(),
 
                 const SizedBox(height: 8),
 
-                // ── Forgot password ────────────────────────────────
+                // Forgot password
                 Align(
-                  alignment:
-                      isRTL ? Alignment.centerLeft : Alignment.centerRight,
+                  alignment: isRTL ? Alignment.centerLeft : Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
                       Navigator.push(
@@ -476,15 +607,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       t('forgot_password'),
-                      style: const TextStyle(
-                          color: primaryBrown, fontSize: 14),
+                      style: const TextStyle(color: primaryBrown, fontSize: 14),
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 8),
 
-                // ── Log In button ──────────────────────────────────
+                // Log In button
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -518,34 +648,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 28),
 
-                // ── Divider ────────────────────────────────────────
+                // Divider
                 Row(
                   children: [
-                    const Expanded(
-                        child: Divider(color: Color(0xFFDDDDDD))),
+                    const Expanded(child: Divider(color: Color(0xFFDDDDDD))),
                     Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
                         t('or_continue'),
-                        style: TextStyle(
-                            color: Colors.grey[500], fontSize: 13),
+                        style: TextStyle(color: Colors.grey[500], fontSize: 13),
                       ),
                     ),
-                    const Expanded(
-                        child: Divider(color: Color(0xFFDDDDDD))),
+                    const Expanded(child: Divider(color: Color(0xFFDDDDDD))),
                   ],
                 ),
 
                 const SizedBox(height: 20),
 
-                // ── Google button ──────────────────────────────────
+                // Google button
                 SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: OutlinedButton(
                     onPressed: () {
-                      // TODO: Google Sign-In with Firebase
+                      // TODO: Google Sign-In
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFDDDDDD)),
@@ -579,7 +705,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 28),
 
-                // ── Create account ─────────────────────────────────
+                // Create account
                 Center(
                   child: TextButton(
                     onPressed: () {
@@ -620,7 +746,7 @@ class _LoginScreenState extends State<LoginScreen> {
         onTap: () {
           setState(() {
             _selectedMethod = method;
-            _identifierController.clear(); // optional: clear field when switching
+            _identifierController.clear();
             _identifierError = '';
           });
         },
@@ -660,17 +786,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
-            textDirection:
-                isRTL ? TextDirection.rtl : TextDirection.ltr,
+            textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle:
-                  TextStyle(color: Colors.grey[500], fontSize: 15),
-              prefixIcon: Icon(icon,
-                  color: primaryBrown.withOpacity(0.7), size: 22),
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
+              prefixIcon: Icon(icon, color: primaryBrown.withOpacity(0.7), size: 22),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                  vertical: 18, horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
             ),
           ),
         ),
@@ -678,8 +800,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 4),
             child: Text(errorText,
-                style:
-                    const TextStyle(color: Colors.red, fontSize: 12)),
+                style: const TextStyle(color: Colors.red, fontSize: 12)),
           ),
       ],
     );
@@ -697,8 +818,7 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: _obscurePassword,
             decoration: InputDecoration(
               hintText: t('password_hint'),
-              hintStyle:
-                  TextStyle(color: Colors.grey[500], fontSize: 15),
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
               prefixIcon: Icon(Icons.lock_outline,
                   color: primaryBrown.withOpacity(0.7), size: 22),
               suffixIcon: IconButton(
@@ -709,12 +829,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.grey[400],
                   size: 22,
                 ),
-                onPressed: () => setState(
-                    () => _obscurePassword = !_obscurePassword),
+                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
               ),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                  vertical: 18, horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
             ),
           ),
         ),
@@ -722,8 +840,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 4),
             child: Text(_passwordError,
-                style:
-                    const TextStyle(color: Colors.red, fontSize: 12)),
+                style: const TextStyle(color: Colors.red, fontSize: 12)),
           ),
       ],
     );

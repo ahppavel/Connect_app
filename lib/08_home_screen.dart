@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '09_profile_screen.dart';
+import '10_group_screen.dart';
+import '11_calls_screen.dart'; // Import your CallsScreen
 
 class HomeScreen extends StatefulWidget {
   final String languageCode;
@@ -295,8 +297,6 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
           builder: (_) => NewGroupScreen(
             languageCode: widget.languageCode,
-            titleText: _t('new_group_title'),
-            subtitleText: _t('new_group_sub'),
             isDarkMode: _isDarkMode,
           ),
         ),
@@ -404,52 +404,78 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Container(
-              height: 46,
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: TextField(
-                controller: _searchController,
-                style: TextStyle(color: textPrimary, fontSize: 15),
-                onChanged: (val) => setState(() => _searchQuery = val),
-                decoration: InputDecoration(
-                  hintText: _t('search'),
-                  hintStyle: TextStyle(color: textSecondary, fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: textSecondary, size: 20),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(Icons.close, color: textSecondary, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 13),
+          // Search bar – shown only on Chats tab (index 0)
+          if (_currentTab == 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Container(
+                height: 46,
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(color: textPrimary, fontSize: 15),
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                  decoration: InputDecoration(
+                    hintText: _t('search'),
+                    hintStyle: TextStyle(color: textSecondary, fontSize: 14),
+                    prefixIcon: Icon(Icons.search, color: textSecondary, size: 20),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.close, color: textSecondary, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 4),
           Expanded(
-            child: _filteredChats.isEmpty
-                ? _buildEmptyState()
-                : ListView.separated(
-                    padding: const EdgeInsets.only(top: 4),
-                    itemCount: _filteredChats.length,
-                    separatorBuilder: (_, __) => Divider(
-                      height: 0.5,
-                      color: dividerColor,
-                      indent: 84,
-                    ),
-                    itemBuilder: (context, index) =>
-                        _chatTile(_filteredChats[index]),
+            child: IndexedStack(
+              index: _currentTab,
+              children: [
+                // Tab 0: Chats
+                _filteredChats.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.separated(
+                        padding: const EdgeInsets.only(top: 4),
+                        itemCount: _filteredChats.length,
+                        separatorBuilder: (_, __) => Divider(
+                          height: 0.5,
+                          color: dividerColor,
+                          indent: 84,
+                        ),
+                        itemBuilder: (context, index) =>
+                            _chatTile(_filteredChats[index]),
+                      ),
+                // Tab 1: Stories (placeholder)
+                Center(
+                  child: Text(
+                    'Stories Screen – coming soon',
+                    style: TextStyle(color: textSecondary),
                   ),
+                ),
+                // Tab 2: Calls – integrate CallsScreen
+                CallsScreen(
+                  languageCode: widget.languageCode,
+                  isDarkMode: _isDarkMode,
+                ),
+                // Tab 3: Settings (placeholder)
+                Center(
+                  child: Text(
+                    'Settings Screen – coming soon',
+                    style: TextStyle(color: textSecondary),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -717,105 +743,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class NewGroupScreen extends StatelessWidget {
-  final String languageCode;
-  final String titleText;
-  final String subtitleText;
-  final bool isDarkMode;
-
-  const NewGroupScreen({
-    super.key,
-    required this.languageCode,
-    required this.titleText,
-    required this.subtitleText,
-    required this.isDarkMode,
-  });
-
-  static const Color primary = Color(0xFF9d4d36);
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF7F9FC);
-    final cardBg = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
-    final textPrimary =
-        isDarkMode ? Colors.white : const Color(0xFF191c1e);
-    final textSecondary =
-        isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
-
-    return Scaffold(
-      backgroundColor: bg,
-      appBar: AppBar(
-        backgroundColor: bg,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: primary),
-        title: Text(
-          titleText,
-          style: TextStyle(
-            color: textPrimary,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-          ),
-        ),
-      ),
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.group_add_outlined,
-                  color: primary,
-                  size: 34,
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                titleText,
-                style: TextStyle(
-                  color: textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                subtitleText,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: textSecondary,
-                  fontSize: 14,
-                  height: 1.5,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
