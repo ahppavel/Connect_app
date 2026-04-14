@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Firebase
-  firebase_core: ^4.6.0
+  firebase_core: ^4.7.0
   firebase_auth: ^6.3.0
   cloud_firestore: ^6.2.0
   firebase_storage: ^13.2.0
@@ -39,6 +39,7 @@ dependencies:
 
   # Local storage
   shared_preferences: ^2.5.3
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
