@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '09_profile_screen.dart';
 import '10_group_screen.dart';
-import '11_calls_screen.dart'; // Import your CallsScreen
+import '11_calls_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
   final String languageCode;
@@ -404,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          // Search bar – shown only on Chats tab (index 0)
+          // Search bar 
           if (_currentTab == 0)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -462,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(color: textSecondary),
                   ),
                 ),
-                // Tab 2: Calls – integrate CallsScreen
+                // Tab 2: Calls
                 CallsScreen(
                   languageCode: widget.languageCode,
                   isDarkMode: _isDarkMode,

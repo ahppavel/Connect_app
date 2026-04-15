@@ -484,7 +484,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
   }
 }
 
-// ── Screen 2: Group Setup ─────────────────────────────────────────────────────
+// Screen 2: Group Setup
 class _GroupSetupScreen extends StatefulWidget {
   final String languageCode;
   final bool isDarkMode;

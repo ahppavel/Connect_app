@@ -50,7 +50,7 @@ class _CallsScreenState extends State<CallsScreen>
   String _searchQuery = '';
 
   // Default empty list
-  // Real calls will be added here later from Firebase / backend
+  // Real calls will be added here later
   final List<CallRecord> _calls = [];
 
   @override

@@ -32,7 +32,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar
+            // Top
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -56,7 +56,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               ),
             ),
 
-            // Globe icon
+            // icon
             const SizedBox(height: 16),
             Container(
               width: 90,
@@ -104,7 +104,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
             const SizedBox(height: 24),
 
-            // Language list
+            // Language 
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -177,7 +177,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                           ),
                           const SizedBox(width: 16),
 
-                          // Language name
+                          // Lan name
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +206,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                             ),
                           ),
 
-                          // Animated radio button
+                          // Animated button
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
@@ -237,7 +237,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               ),
             ),
 
-            // Arrow button
+            // Arrow
             Padding(
               padding: const EdgeInsets.all(24),
               child: Align(

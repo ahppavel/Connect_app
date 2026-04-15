@@ -226,7 +226,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     super.dispose();
   }
 
-  // ----- Image picker methods -----
+  // image picker
   Future<void> _showImageSourceModal() async {
     showModalBottomSheet(
       context: context,
@@ -334,7 +334,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     }
   }
 
-  // Optimized country picker with search and smooth scrolling
+  // country picker
   void _showCountryPicker() {
     showModalBottomSheet(
       context: context,
@@ -442,7 +442,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       setState(() => _errorMessage = t('email_not_verified'));
       return;
     }
-    // Phone validation: number part must be at least 6 digits
+    // Phone validation
     final phoneNumber = _phoneNumberController.text.trim();
     if (phoneNumber.isNotEmpty) {
       if (!RegExp(r'^\d{6,15}$').hasMatch(phoneNumber)) {
@@ -580,7 +580,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 const SizedBox(height: 14),
 
-                // Username (min 5 chars)
+                // Username 
                 _label(t('username_label')),
                 Row(
                   children: [
@@ -665,7 +665,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 const SizedBox(height: 14),
 
-                // Phone (optional) with country code picker
+                // phone number
                 _label(t('phone_optional')),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1122,7 +1122,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 }
 
-// ── Complete translations for ALL languages with new keys ───────────────────
 const Map<String, Map<String, String>> _tr = {
   'EN': {
     'create_account': 'Create Account',

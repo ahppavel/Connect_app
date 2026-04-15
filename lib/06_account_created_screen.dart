@@ -239,7 +239,7 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                 ),
               ),
               const Spacer(),
-              // No-splash button: GestureDetector + Container
+              
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: SizedBox(
@@ -247,9 +247,9 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
                   height: 54,
                   child: GestureDetector(
                     onTap: () {
-                      // Dismiss keyboard to avoid any visual glitch
+                      
                       FocusScope.of(context).unfocus();
-                      // Slight delay to let keyboard close
+                      
                       Future.delayed(const Duration(milliseconds: 50), () {
                         if (!mounted) return;
                         Navigator.pushReplacement(
@@ -377,7 +377,6 @@ class _AccountCreatedScreenState extends State<AccountCreatedScreen>
   }
 }
 
-// Complete translations for all 10 languages
 const Map<String, Map<String, String>> _tr = {
   'EN': {
     'all_set': "You're all set!",

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 import '08_home_screen.dart';
 
-// ---------- Bubble Data Model ----------
+// bubbles 
 class _BubbleData {
   String text;
   double startX;
@@ -24,7 +24,7 @@ class _BubbleData {
   });
 }
 
-// ---------- Animated Bubble Background ----------
+// aniimated bubble layer
 class _BubbleLayer extends StatefulWidget {
   const _BubbleLayer();
 
@@ -141,7 +141,7 @@ class _BubbleLayerState extends State<_BubbleLayer>
   }
 }
 
-// ---------- Transition Screen ----------
+
 class TransitionScreen extends StatefulWidget {
   final String languageCode;
   final String languageName;
@@ -257,7 +257,7 @@ class _TransitionScreenState extends State<TransitionScreen>
         children: [
           // Bubble background (animated)
           const _BubbleLayer(),
-          // Foreground content with fade transitions
+          
           AnimatedBuilder(
             animation: Listenable.merge([_fadeInController, _fadeOutController, _textController]),
             builder: (context, child) {
@@ -268,7 +268,7 @@ class _TransitionScreenState extends State<TransitionScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Connect text
+                      
                       Opacity(
                         opacity: (_textFadeAnim.value * _fadeOutAnim.value).clamp(0.0, 1.0),
                         child: Transform.translate(

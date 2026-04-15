@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   late AnimationController _saveAnimController;
   late Animation<double> _saveScaleAnim;
 
-  // ── Localization (all languages from HomeScreen) ─────────────────────────
+  
   String _t(String key) {
     final Map<String, Map<String, String>> tr = {
       'EN': {
@@ -532,7 +532,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   bool get _canChangeUsername => _daysUntilUsernameChange == 0;
 
-  // ── Photo picker (no camera overlay on avatar) ───────────────────────────
+  
   void _showPhotoOptions() {
     showModalBottomSheet(
       context: context,
@@ -622,7 +622,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // ── Edit name/bio ────────────────────────────────────────────────────────
+
   void _editField({
     required String title,
     required TextEditingController controller,
@@ -706,7 +706,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // ── Edit username (with lock) ────────────────────────────────────────────
+  
   void _editUsername() {
     if (!_canChangeUsername) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -822,7 +822,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // ── Links ─────────────────────────────────────────────────────────────────
+  
   void _showAddLinkDialog({int? editIndex}) {
     final nameCtrl = TextEditingController(
         text: editIndex != null ? _links[editIndex]['name'] : '');
@@ -1002,7 +1002,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  // ── Save profile ─────────────────────────────────────────────────────────
+  // Save profile 
   Future<void> _saveProfile() async {
     if (_isSaving) return;
     HapticFeedback.mediumImpact();
@@ -1041,7 +1041,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  // ── Build ────────────────────────────────────────────────────────────────
+  // ── Build
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -92,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 const Spacer(flex: 1),
 
-                // Floating orb
+                // Floatin
                 AnimatedBuilder(
                   animation: Listenable.merge(
                       [_floatAnimation, _morphController, _scaleAnimation]),
@@ -127,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                 const SizedBox(height: 40),
 
-                // Text section
+                // Text 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Column(

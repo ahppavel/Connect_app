@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '04_forgot_password_screen.dart';
 import '05_create_account_screen.dart';
-import '07_transition_screen.dart';   // adjust path if needed
+import '07_transition_screen.dart';   
 
-// ── Complete translations for all languages ──────────────────────────────────
 const Map<String, Map<String, String>> _translations = {
   'EN': {
     'email': 'Email',
@@ -275,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool get isRTL => widget.languageCode.toUpperCase() == 'AR';
 
-  // Build user data from identifier (demo only)
+  // Build user data from identifier
   Map<String, String> _buildUserData(String identifier) {
     switch (_selectedMethod) {
       case LoginMethod.email:
@@ -297,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // New animated success message with better design
+  // success msg button design
   void _showTopSuccessMessage() {
     final overlay = Overlay.of(context);
 
@@ -390,7 +389,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text;
     bool hasError = false;
 
-    // Validation (same as before)
+    // Validation 
     switch (_selectedMethod) {
       case LoginMethod.email:
         if (identifier.isEmpty) {
@@ -459,7 +458,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ─────────────── UI Getters ───────────────
   String get _identifierHint {
     switch (_selectedMethod) {
       case LoginMethod.email:
@@ -493,7 +491,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // ─────────────── UI Building ───────────────
+  
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -508,7 +506,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 16),
 
-                // Top bar
+                // top bar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -556,7 +554,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 40),
 
-                // Login method selector
+                // Login method buttons
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -574,7 +572,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 16),
 
-                // Identifier field
+                
                 _buildInputField(
                   controller: _identifierController,
                   hint: _identifierHint,
@@ -585,12 +583,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 14),
 
-                // Password field
+                
                 _buildPasswordField(),
 
                 const SizedBox(height: 8),
 
-                // Forgot password
+                // Forgot pass
                 Align(
                   alignment: isRTL ? Alignment.centerLeft : Alignment.centerRight,
                   child: TextButton(

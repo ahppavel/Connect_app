@@ -16,7 +16,7 @@
     <!-- Internet (Firebase, Google Sign-In) -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- ✅ Required for url_launcher (Android 11+) -->
+    <!--  Required for url_launcher (Android 11+) -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />

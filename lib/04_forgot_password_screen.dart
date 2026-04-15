@@ -893,7 +893,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   }
 }
 
-// ─── COMPLETE TRANSLATIONS (11 LANGUAGES) ─────────────────────────────────────
+
 const Map<String, Map<String, String>> _fpTranslations = {
   'EN': {
     'page_title': 'Account Recovery',
